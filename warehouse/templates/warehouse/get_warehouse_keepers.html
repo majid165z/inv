@@ -1,0 +1,28 @@
+{% if users %}
+<table class="table table-striped">
+    <thead>
+        <tr>
+            <th scope="col">#</th>
+            <th scope="col">Name</th>
+            <th scope="col">Last Name</th>
+            <th scope="col">Username</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for user in users %}
+        <tr>
+            <th scope="row">{{forloop.counter}}</th>
+            <td><a href="{{user.get_edit_url}}">{{user.first_name}}</a></td>
+            <td>
+                {{user.last_name}}
+            </td>
+            <td>
+                {{user.username}}
+            </td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+{% else %}
+<h1>There is no warehouse keeper registred for this warehouse</h1>
+{% endif %}    

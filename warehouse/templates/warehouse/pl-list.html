@@ -1,0 +1,88 @@
+{% extends 'core/base.html' %} {% block content %}
+{% load jalali_tags %}
+<div class="col-12 col-md-10 rounded p-5 mx-auto bg-white">
+    <a class="btn btn-primary" style="float: right;" href="{% url 'pl_add' %}">+
+        Create Packing List  
+        </a>
+    
+    {% if pls %}
+    <table class="table table-striped">
+        <thead>
+            <tr>
+                <th scope="col">#</th>
+                <th scope="col">Packing List Number</th>
+                <th scope="col">Project</th>
+                <th scope="col">MR Number</th>
+                <th scope="col">PO Number</th>
+                <th scope="col">Created By</th>
+                <th scope="col">Sent Date</th>
+                <th scope="col">Submited Date </th>
+    
+            </tr>
+        </thead>
+        <tbody>
+            {% for pl in pls %}
+            <tr>
+                <th scope="row">{{forloop.counter}}</th>
+                <td><a href="{{pl.get_edit_url}}">{{pl.number}}</a></td>
+                <td>{{pl.project}}</td>
+                <td>{{pl.mr}}</td>
+                <td>{{pl.po}}</td>
+                <td>
+                    {{pl.created_by.first_name}} {{pl.created_by.last_name}} ({{pl.created_by}})
+                </td>
+                <td>
+                    {{pl.date|to_jalali:'%Y/%m/%d'}}
+                </td>
+                <td>
+                    {{pl.created|to_jalali:'%Y/%m/%d'}}
+                    {% if request.user.is_superuser or request.user.technical %}
+                    <span class="delete" id="pl-{{pl.id}}" data-id="{{pl.id}}">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" color="red" fill="currentColor" class="bi bi-trash" viewBox="0 0 16 16">
+                            <path d="M5.5 5.5A.5.5 0 0 1 6 6v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5Zm2.5 0a.5.5 0 0 1 .5.5v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5Zm3 .5a.5.5 0 0 0-1 0v6a.5.5 0 0 0 1 0V6Z"/>
+                            <path d="M14.5 3a1 1 0 0 1-1 1H13v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V4h-.5a1 1 0 0 1-1-1V2a1 1 0 0 1 1-1H6a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1h3.5a1 1 0 0 1 1 1v1ZM4.118 4 4 4.059V13a1 1 0 0 0 1 1h6a1 1 0 0 0 1-1V4.059L11.882 4H4.118ZM2.5 3h11V2h-11v1Z"/>
+                          </svg>
+                    </span>
+                    {% endif %}
+
+                </td>
+
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    {% else %}
+    <h1>There is no Packing List registered</h1>
+    {% endif %}    
+</div>
+{% endblock %}
+{% block js %}
+<script>
+    $('table').DataTable(
+        {
+        "lengthMenu": [ 25, 50, 75, 100 ]
+        }
+    )
+
+    $('body').on('click','.delete',function(event){
+        let target = event.currentTarget
+        let id = target.getAttribute("data-id")
+        $.ajax({
+            url : '',
+            method : 'post',
+            data : {
+                id:id,
+            }
+        }).done(function(data){
+            if(data.success){
+                target.closest("tr").style.display = "none"
+                alert(data.msg)
+            } else {
+                alert(data.msg)
+            }
+
+
+        })
+    })
+</script>
+{% endblock %}

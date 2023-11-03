@@ -1,0 +1,50 @@
+{% extends 'core/base.html' %} {% block content %}
+{% load jalali_tags %}
+<div class="col-12 col-md-10 rounded p-5 mx-auto bg-white">
+    <a class="btn btn-primary" style="float: right;" href="{% url 'project_add' %}">+
+        Create Project   
+        </a>
+    
+    {% if projects %}
+    <table class="table table-striped">
+        <thead>
+            <tr>
+                <th scope="col">#</th>
+                <th scope="col">Project Name</th>
+                <th scope="col">Project Number</th>
+                <th scope="col">Created By</th>
+                <th scope="col">Date Submited</th>
+    
+            </tr>
+        </thead>
+        <tbody>
+            {% for project in projects %}
+            <tr>
+                <th scope="row">{{forloop.counter}}</th>
+                <td><a href="{{project.get_edit_url}}">{{project.name}}</a></td>
+                <td><a href="{{project.get_edit_url}}">{{project.number}}</a></td>
+                <td>
+                    {{project.created_by.first_name}} {{project.created_by.last_name}} ({{project.created_by}})
+                </td>
+                <td>
+                    {{project.created|to_jalali:'%Y/%m/%d'}}
+                </td>
+
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    {% else %}
+    <h1>There is no Project.</h1>
+    {% endif %}    
+</div>
+{% endblock %}
+{% block js %}
+<script>
+    $('table').DataTable(
+        {
+        "lengthMenu": [ 25, 50, 75, 100 ]
+        }
+    );
+</script>
+{% endblock %}

@@ -1,0 +1,83 @@
+{{ formset.management_form }}
+<hr class="mt-2">
+<h3 class="text-center">submit the details here</h3>
+
+<div class="row p-0 m-0">
+    <div class="col-12 col-md-10">
+        <p class="pb-1 mb-1 text-center">{{ formset.empty_form.po_item.label_tag }}</p>
+    </div>
+
+    <div class="col-12 col-md-2">
+        <p class="pb-1 mb-1 text-center">{{ formset.empty_form.quantity.label_tag }}</p>
+    </div>
+
+</div>
+<div id="formset_container">  
+{% for forms in formset %}
+    <div class="row p-0 m-0 my-1 form-row actives">
+        {{forms.id}}
+        <div class="col-12 col-md-10 p-1">
+            <!-- <p class="pb-1 mb-1">{{ forms.number.label_tag }}</p> -->
+            {{ forms.po_item }}
+            {{forms.po_item.errors}}
+        </div>
+
+        <div class="col-12 col-md-2 p-1">
+            <!-- <p class="pb-1 mb-1">{{ forms.quantity.label_tag }}</p> -->
+            <div class="row m-0 p-0">
+                <div class="col-md-10">
+                    {{ forms.quantity }}
+                    {{forms.quantity.errors}}
+        
+                </div>
+                <div class="col-md-2">
+                    <span class="delete">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" color="red" fill="currentColor" class="bi bi-trash" viewBox="0 0 16 16">
+                            <path d="M5.5 5.5A.5.5 0 0 1 6 6v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5Zm2.5 0a.5.5 0 0 1 .5.5v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5Zm3 .5a.5.5 0 0 0-1 0v6a.5.5 0 0 0 1 0V6Z"/>
+                            <path d="M14.5 3a1 1 0 0 1-1 1H13v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V4h-.5a1 1 0 0 1-1-1V2a1 1 0 0 1 1-1H6a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1h3.5a1 1 0 0 1 1 1v1ZM4.118 4 4 4.059V13a1 1 0 0 0 1 1h6a1 1 0 0 0 1-1V4.059L11.882 4H4.118ZM2.5 3h11V2h-11v1Z"/>
+                          </svg>
+                    </span>
+
+                    {{ forms.DELETE }}
+                    {{forms.DELETE.errors}}
+                    
+                </div>
+            </div>
+        </div>
+
+    </div>
+{% endfor %}
+</div>
+<div id="empty_form" hidden>
+    <div class="row p-0 m-0 my-1 form-row">
+        {{formset.empty_form.id}}
+        <div class="col-12 col-md-10 p-1">
+            <!-- <p class="pb-1 mb-1">{{ forms.number.label_tag }}</p> -->
+            {{ formset.empty_form.po_item }}
+            {{formset.empty_form.po_item.errors}}
+        </div>
+
+        <div class="col-12 col-md-2 p-1">
+            <!-- <p class="pb-1 mb-1">{{ forms.quantity.label_tag }}</p> -->
+            <div class="row m-0 p-0">
+                <div class="col-10 col-md-10">
+                    {{ formset.empty_form.quantity }}
+                    {{formset.empty_form.quantity.errors}}
+        
+                </div>
+                <div class="col-2 col-md-2">
+                    <span class="delete">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" color="red" fill="currentColor" class="bi bi-trash" viewBox="0 0 16 16">
+                            <path d="M5.5 5.5A.5.5 0 0 1 6 6v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5Zm2.5 0a.5.5 0 0 1 .5.5v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5Zm3 .5a.5.5 0 0 0-1 0v6a.5.5 0 0 0 1 0V6Z"/>
+                            <path d="M14.5 3a1 1 0 0 1-1 1H13v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V4h-.5a1 1 0 0 1-1-1V2a1 1 0 0 1 1-1H6a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1h3.5a1 1 0 0 1 1 1v1ZM4.118 4 4 4.059V13a1 1 0 0 0 1 1h6a1 1 0 0 0 1-1V4.059L11.882 4H4.118ZM2.5 3h11V2h-11v1Z"/>
+                          </svg>
+                    </span>
+
+                    {{ formset.empty_form.DELETE }}
+                    {{formset.empty_form.DELETE.errors}}
+                </div>
+            </div>
+        </div>
+
+    </div>
+</div>

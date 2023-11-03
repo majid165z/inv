@@ -1,0 +1,172 @@
+<nav class="navbar navbar-expand-lg bg-body-tertiary mb-2">
+  <div class="container-fluid">
+    <a class="navbar-brand" href="{% url 'home' %}">Maroon Manategh Co.</a>
+    <button
+      class="navbar-toggler"
+      type="button"
+      data-bs-toggle="collapse"
+      data-bs-target="#homeNavBar"
+      aria-controls="homeNavBar"
+      aria-expanded="false"
+      aria-label="Toggle navigation"
+    >
+      <span class="navbar-toggler-icon"></span>
+    </button>
+    <div class="collapse navbar-collapse" id="homeNavBar">
+      <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+
+        {% if request.user.is_authenticated and request.user.is_superuser %}
+        <li class="nav-item dropdown">
+          <a
+            class="nav-link dropdown-toggle"
+            href="#"
+            role="button"
+            data-bs-toggle="dropdown"
+            aria-expanded="false"
+          >
+            Users
+          </a>
+          <ul class="dropdown-menu">
+            <li><a class="dropdown-item" href="{% url 'user_list' %}">List of Users </a></li>
+            <li><hr class="dropdown-divider" /></li>
+            <li><a class="dropdown-item" href="{% url 'create_user' %}">Create a new User </a></li>
+          </ul>
+        </li>
+        {% endif %}
+        {% if request.user.is_authenticated and request.user.is_superuser %}
+        <li class="nav-item dropdown">
+          <a
+            class="nav-link dropdown-toggle"
+            href="#"
+            role="button"
+            data-bs-toggle="dropdown"
+            aria-expanded="false"
+          >
+            Warehouses
+          </a>
+          <ul class="dropdown-menu">
+            <li><a class="dropdown-item" href="{% url 'warehouse_list' %}">List of Warehouses</a></li>
+            <li><a class="dropdown-item" href="{% url 'warehouse_add' %}">create a new Warehouse</a></li>
+            <li><hr class="dropdown-divider" /></li>
+            <li><a class="dropdown-item" href="{% url 'unit_list' %}">List of Units</a></li>
+            <li><a class="dropdown-item" href="{% url 'unit_add' %}">Create a new Unit </a></li>
+            <li><hr class="dropdown-divider" /></li>
+            <li><a class="dropdown-item" href="{% url 'condition_list' %}">List of Conditions</a></li>
+            <li><a class="dropdown-item" href="{% url 'condition_add' %}">Create a new Condition </a></li>
+          
+            <li><hr class="dropdown-divider" /></li>
+            <li><a class="dropdown-item" href="{% url 'category_list' %}">List of Category</a></li>
+            <li><a class="dropdown-item" href="{% url 'category_add' %}">Create a new Category </a></li>
+            
+            <li><hr class="dropdown-divider" /></li>
+            <li><a class="dropdown-item" href="{% url 'cluster_list' %}">List of Cluster</a></li>
+            <li><a class="dropdown-item" href="{% url 'cluster_add' %}">Create a new Cluster </a></li>
+            
+            <li><hr class="dropdown-divider" /></li>
+            <li><a class="dropdown-item" href="{% url 'pipe_line_list' %}">List of Pipe Line</a></li>
+            <li><a class="dropdown-item" href="{% url 'pipe_line_add' %}">Create a new Pipe Line </a></li>
+          
+          </ul>
+        </li>
+
+        <li class="nav-item dropdown">
+          <a
+            class="nav-link dropdown-toggle"
+            href="#"
+            role="button"
+            data-bs-toggle="dropdown"
+            aria-expanded="false"
+          >
+          Projects
+          </a>
+          <ul class="dropdown-menu">
+            <li><a class="dropdown-item" href="{% url 'project_list' %}">List of Projects</a></li>
+            <li><a class="dropdown-item" href="{% url 'project_add' %}">Create a new Project</a></li>
+            <li><hr class="dropdown-divider" /></li>
+            <li><a class="dropdown-item" href="{% url 'mr_number_list' %}">List of MR Numbers</a></li>
+            <li><a class="dropdown-item" href="{% url 'mr_number_add' %}">Create a new MR Number</a></li>
+          </ul>
+        </li>
+
+        {% endif %}
+
+
+        {% if request.user.is_authenticated %}
+          {% if request.user.is_superuser or request.user.technical %}
+          <li class="nav-item dropdown">
+            <a
+              class="nav-link dropdown-toggle"
+              href="#"
+              role="button"
+              data-bs-toggle="dropdown"
+              aria-expanded="false"
+            >
+              Procurement Cycle
+            </a>
+            <ul class="dropdown-menu">              
+              <li><a class="dropdown-item" href="{% url 'po_list' %}">List of POs</a></li>
+              <li><a class="dropdown-item" href="{% url 'po_add' %}">Create a new PO </a></li>
+              <li><hr class="dropdown-divider" /></li>
+              <li><a class="dropdown-item" href="{% url 'pl_list' %}">List of Packing Lists </a></li>
+              <li><a class="dropdown-item" href="{% url 'pl_add' %}">Create a new Packing List </a></li>
+              <li><hr class="dropdown-divider" /></li>
+              <li><a class="dropdown-item" href="{% url 'mrs_list' %}">List of MRS </a></li>
+              <li><a class="dropdown-item" href="{% url 'mrs_add' %}">Create a new MRS </a></li>
+              <li><hr class="dropdown-divider" /></li>
+              <li><a class="dropdown-item" href="{% url 'mir_list' %}">List of MIR </a></li>
+              <li><a class="dropdown-item" href="{% url 'mir_add' %}">Create a new MIR </a></li>
+            </ul>
+          </li>          
+          {% endif %}
+          {% if request.user.is_superuser or request.user.warehouse_keeper %}
+          <li class="nav-item dropdown">
+            <a
+              class="nav-link dropdown-toggle"
+              href="#"
+              role="button"
+              data-bs-toggle="dropdown"
+              aria-expanded="false"
+            >
+              Warehouse Management
+            </a>
+            <ul class="dropdown-menu">   
+              <li><a class="dropdown-item" href="{% url 'mrs_list' %}">List of MRS </a></li>
+              <li><a class="dropdown-item" href="{% url 'mrs_add' %}">Create a new MRS </a></li>
+              <li><hr class="dropdown-divider" /></li>
+           
+              <li><a class="dropdown-item" href="{% url 'mir_list_warehouse' %}">List of MIR </a></li>
+            </ul>
+          </li>          
+          {% endif %}
+
+
+
+          
+        {% endif %}
+
+
+      </ul>
+
+      <ul class="navbar-nav ms-auto mb-2 mb-lg-0">
+          {% if request.user.is_authenticated %}
+        <li class="nav-item dropdown">
+          <a
+            class="nav-link dropdown-toggle"
+            href="#"
+            role="button"
+            data-bs-toggle="dropdown"
+            aria-expanded="false"
+          >
+            {{request.user.first_name}} {{request.user.last_name}}
+          </a>
+          <ul class="dropdown-menu" style="left: auto !important;right:0px">
+            <li><a class="dropdown-item" href="{% url 'password_change' %}">Change your password</a></li>
+            <li><hr class="dropdown-divider" /></li>
+            <li><a class="dropdown-item" href="{% url 'logout' %}">Exit (logout)</a></li>
+          </ul>
+        </li>
+        {% endif %}
+      </ul>
+    </div>
+  </div>
+</nav>

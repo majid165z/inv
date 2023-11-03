@@ -1,0 +1,125 @@
+{% extends 'core/base.html' %} {% block content %}
+
+<div class="col-12 col-md-10 rounded p-5 mx-auto bg-white">
+    <a class="btn btn-primary" style="float: right;" href="{% url 'warehouse_add' %}">+ Create Warehouse</a>
+    {% if warehouses %}
+    <table class="table table-striped">
+        <thead>
+            <tr>
+                <th scope="col">#</th>
+                <th scope="col">Name</th>
+                <th scope="col">Address</th>
+                <th scope="col">Products</th>
+                <th scope="col">Warehouse keepers</th>
+    
+            </tr>
+        </thead>
+        <tbody>
+            {% for warehouse in warehouses %}
+            <tr>
+                <th scope="row">{{forloop.counter}}</th>
+                <td><a href="{{warehouse.get_edit_url}}">{{warehouse.name}}</a></td>
+                <td>
+                    {{warehouse.address}}
+                </td>
+                <td>
+                    <button class="btn btn-info"
+                    data-bs-toggle="modal" data-bs-target="#WarehouseItems"
+                    data-bs-id = "{{warehouse.id}}">List of Items</button>
+                    
+                </td>
+                <td>
+                    <button class="btn btn-info"
+                    data-bs-toggle="modal" data-bs-target="#warehouseKeeperModal"
+                    data-bs-id = "{{warehouse.id}}"
+                    >Warehouse Keepers</button>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    {% else %}
+    <h1>There is no Warehouse.</h1>
+    {% endif %}    
+</div>
+
+
+<!-- Modal for warehouse keepers -->
+<div class="modal fade" id="warehouseKeeperModal" tabindex="-1" aria-labelledby="warehouseKeeperModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h1 class="modal-title fs-5" id="warehouseKeeperModalLabel">List of Warehouse Keepers</h1>
+          <button type="button" class="btn-close m-0 p-0" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body" id="warehousekeeper_id">
+        </div>
+      </div>
+    </div>
+</div>
+<!-- Modal for warehouse items -->
+<div class="modal fade" id="WarehouseItems" tabindex="-1" aria-labelledby="WarehouseItemsLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h1 class="modal-title fs-5" id="WarehouseItemsLabel">List of Warehouse Iems</h1>
+          <button type="button" class="btn-close m-0 p-0" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body" id="warehouseitems_id">
+        </div>
+      </div>
+    </div>
+</div>
+{% endblock %}
+
+
+{% block js %}
+<script>
+    $('table').DataTable(
+        {
+        "lengthMenu": [ 25, 50, 75, 100 ]
+        }
+    );
+    const warehouseKeeperModal = document.getElementById('warehouseKeeperModal')
+if (warehouseKeeperModal) {
+    warehouseKeeperModal.addEventListener('show.bs.modal', event => {
+    // Button that triggered the modal
+    const button = event.relatedTarget
+    // Extract info from data-bs-* attributes
+    const id = button.getAttribute('data-bs-id')
+    const modalContent = document.getElementById("warehousekeeper_id")
+
+    $.ajax({
+        method : 'get',
+        url : '{% url "get_warehouse_keepers" %}',
+        data : {id:id}
+    }).done (function (data) {
+        modalContent.innerHTML = data
+    }).fail(function(data){
+        modalContent.innerHTML = "<h1>Something went wrong please try again.</h1>"
+    })
+  })
+}
+
+
+
+const warehouseItemsModal = document.getElementById('WarehouseItems')
+if (warehouseItemsModal) {
+    warehouseItemsModal.addEventListener('show.bs.modal', event => {
+    // Button that triggered the modal
+    const button = event.relatedTarget
+    // Extract info from data-bs-* attributes
+    const id = button.getAttribute('data-bs-id')
+    const modalContent = document.getElementById("warehouseitems_id")
+
+    $.ajax({
+        method : 'get',
+        url : '{% url "get_warehouse_items" %}',
+        data : {id:id}
+    }).done (function (data) {
+        modalContent.innerHTML = data
+    })
+  })
+}
+</script>
+{% endblock %}

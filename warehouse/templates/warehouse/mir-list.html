@@ -1,0 +1,78 @@
+{% extends 'core/base.html' %} 
+{% block css %}
+<style>
+    .dt-row {
+        width: 100% !important;
+    }
+</style>
+{% endblock %}
+{% block content %}
+{% load jalali_tags %}
+<div class="col-12 col-md-10 rounded p-5 mx-auto bg-white">
+    <a class="btn btn-primary" style="float: right;" href="{% url 'mir_add' %}">+
+        Create MIR   
+        </a>
+    
+    {% if mirs %}
+    <table class="table table-striped w-100">
+        <thead>
+            <tr>
+                <th scope="col">#</th>
+                <th scope="col">MIR Number</th>
+                <th scope="col">Project</th>
+                <th scope="col">MR Number</th>
+                <th scope="col">PO Number</th>
+                <th scope="col">PL Number</th>
+                <th scope="col">Warehouse</th>
+                <th scope="col">Created By</th>
+                <th scope="col">Date Created</th>
+                <th scope="col">send</th>
+    
+            </tr>
+        </thead>
+        <tbody>
+            {% for mrs in mirs %}
+            <tr>
+                <th scope="row">{{forloop.counter}}</th>
+                <td><a href="{% if not mrs.sent_to_warehouse %}{{mrs.get_edit_url}}{% else %}#{% endif %}">{{mrs.number}}</a></td>
+                <td>{{mrs.project}}</td>
+                <td>{{mrs.mr}}</td>
+                <td>{{mrs.po}}</td>
+                <td>{{mrs.pl}}</td>
+                <td>{{mrs.warehouse}}</td>
+                <td>
+                    {{mrs.created_by.first_name}} {{mrs.created_by.last_name}} ({{mrs.created_by}})
+                </td>
+                <td>
+                    {{mrs.created|to_jalali:'%Y/%m/%d'}}
+                </td>
+                <td>
+                    {% if not mrs.sent_to_warehouse %} 
+                    <form action="{% url 'send_to_warehouse' %}" method="post">
+                        <input type="text" name="id" value="{{mrs.id}}" hidden>
+                    {% csrf_token %}
+                    <button class="btn btn-success">send</button>
+                    </form>
+                    {% endif %}
+
+                </td>
+
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    {% else %}
+    <h1>There is no MIR registered.</h1>
+    {% endif %}    
+</div>
+{% endblock %}
+
+{% block js %}
+<script>
+    $('table').DataTable(
+        {
+        "lengthMenu": [ 25, 50, 75, 100 ]
+        }
+    );
+</script>
+{% endblock %}
