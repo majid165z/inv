@@ -63,7 +63,7 @@ class="row flex justify-content-center align-content-center align-items-center">
 
         <div id="formset_container">  
             {% for forms in formset %}
-                <div class="row p-0 m-0 my-1 form-row">
+                <div class="row p-0 m-0 my-1 form-row actives">
                     {{forms.id}}
                     <div class="col-12 col-md-1 p-1">
                         <!-- <p class="pb-1 mb-1">{{ forms.number.label_tag }}</p> -->
@@ -213,17 +213,13 @@ class="row flex justify-content-center align-content-center align-items-center">
     $.noConflict()
     $(document).ready(function(){
         $('input[type=checkbox]').hide()
-        let deletes = document.querySelectorAll(".delete")
-        deletes.forEach(function(element){
-            element.addEventListener('click',function(event){
-                let target = event.currentTarget
-                target.nextElementSibling.click()
-                target.closest(".form-row").style.display = 'none'
-                //console.log(target.nextElementSibling)
-            })
+        $('body').on('click','.delete',function(event){
+            $(event.currentTarget).next().click()
+            event.currentTarget.closest(".form-row").style.display = 'none'
         })
-        let selectOpt = $("select[id$='-item']")
 
+        $("#formset_container .form-row").addClass("actives")
+        let selectOpt = $(".actives select[id$='-item']")
         selectOpt.select2({
             ajax : {
                 url : '{% url "get_items_ajax" %}',
@@ -243,6 +239,12 @@ class="row flex justify-content-center align-content-center align-items-center">
                 }
               },
         })
+
+        $('select').addClass('form-select')
+        $(".select2-container").addClass("w-100")
+        $(".select2-selection__rendered").addClass('form-control py-1')
+        $('.select2-selection').addClass('border-0')
+
 
         $('body').on('select2:select',function(e){
             var data = e.params.data;
@@ -283,6 +285,36 @@ class="row flex justify-content-center align-content-center align-items-center">
             formContainer.insertAdjacentHTML('beforeend', compiledTmpl);
             total_el.setAttribute('value',Number(count)+1)
             document.querySelector('#add-item').scrollIntoView({ behavior: 'smooth' })
+
+
+            $("#formset_container .form-row").addClass("actives")
+            let selectOpt = $(".actives select[id$='-item']")
+            selectOpt.select2({
+                ajax : {
+                    url : '{% url "get_items_ajax" %}',
+                    dataType:'json'
+                },
+                tags: true,
+                createTag: function (params) {
+                    var term = $.trim(params.term);
+                
+                    if (term === '') {
+                      return null;
+                    }
+                    return {
+                      id: term,
+                      text: term,
+                      newTag: true 
+                    }
+                  },
+            })
+    
+            $('select').addClass('form-select')
+            $(".select2-container").addClass("w-100")
+            $(".select2-selection__rendered").addClass('form-control py-1')
+            $('.select2-selection').addClass('border-0')
+
+
 
 
         })

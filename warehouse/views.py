@@ -152,10 +152,10 @@ def mr_number_list(request:HttpRequest):
 @login_required
 def mr_number_add(request:HttpRequest):
     user = request.user
-    if not user.is_superuser:
-        msg = "You don't have the required permission."
-        messages.error(request,msg)
-        return redirect('mr_number_list')
+    # if not user.is_superuser:
+    #     msg = "You don't have the required permission."
+    #     messages.error(request,msg)
+    #     return redirect('mr_number_list')
     form = MrNumberForm(request.POST or None)
     if form.is_valid():
         obj = form.save(commit=False)
@@ -172,10 +172,10 @@ def mr_number_add(request:HttpRequest):
 @login_required
 def mr_number_edit(request:HttpRequest,id):
     user = request.user
-    if not user.is_superuser:
-        msg = "You don't have the required permission."
-        messages.error(request,msg)
-        return redirect('mr_number_list')
+    # if not user.is_superuser:
+    #     msg = "You don't have the required permission."
+    #     messages.error(request,msg)
+    #     return redirect('mr_number_list')
     instance = MrNumber.objects.get(id=id)
     form = MrNumberForm(request.POST or None,instance=instance)
     if form.is_valid():
@@ -200,10 +200,10 @@ def cluster_list(request:HttpRequest):
 @login_required
 def cluster_add(request:HttpRequest):
     user = request.user
-    if not user.is_superuser:
-        msg = "You don't have the required permission."
-        messages.error(request,msg)
-        return redirect('cluster_list')
+    # if not user.is_superuser:
+    #     msg = "You don't have the required permission."
+    #     messages.error(request,msg)
+    #     return redirect('cluster_list')
     form = ClusterForm(request.POST or None)
     if form.is_valid():
         obj = form.save(commit=False)
@@ -220,10 +220,10 @@ def cluster_add(request:HttpRequest):
 @login_required
 def cluster_edit(request:HttpRequest,id):
     user = request.user
-    if not user.is_superuser:
-        msg = "You don't have the required permission."
-        messages.error(request,msg)
-        return redirect('cluster_list')
+    # if not user.is_superuser:
+    #     msg = "You don't have the required permission."
+    #     messages.error(request,msg)
+    #     return redirect('cluster_list')
     instance = Cluster.objects.get(id=id)
     form = ClusterForm(request.POST or None,instance=instance)
     if form.is_valid():
@@ -249,10 +249,10 @@ def pipe_line_list(request:HttpRequest):
 @login_required
 def pipe_line_add(request:HttpRequest):
     user = request.user
-    if not user.is_superuser:
-        msg = "You don't have the required permission."
-        messages.error(request,msg)
-        return redirect('pipe_line_list')
+    # if not user.is_superuser:
+    #     msg = "You don't have the required permission."
+    #     messages.error(request,msg)
+    #     return redirect('pipe_line_list')
     form = PipeLineForm(request.POST or None)
     if form.is_valid():
         obj = form.save(commit=False)
@@ -269,10 +269,10 @@ def pipe_line_add(request:HttpRequest):
 @login_required
 def pipe_line_edit(request:HttpRequest,id):
     user = request.user
-    if not user.is_superuser:
-        msg = "You don't have the required permission."
-        messages.error(request,msg)
-        return redirect('pipe_line_list')
+    # if not user.is_superuser:
+    #     msg = "You don't have the required permission."
+    #     messages.error(request,msg)
+    #     return redirect('pipe_line_list')
     instance = PipeLine.objects.get(id=id)
     form = PipeLineForm(request.POST or None,instance=instance)
     if form.is_valid():
@@ -297,10 +297,10 @@ def unit_list(request:HttpRequest):
 @login_required
 def unit_add(request:HttpRequest):
     user = request.user
-    if not user.is_superuser:
-        msg = "You don't have the required permission."
-        messages.error(request,msg)
-        return redirect('unit_list')
+    # if not user.is_superuser:
+    #     msg = "You don't have the required permission."
+    #     messages.error(request,msg)
+    #     return redirect('unit_list')
     form = UnitForm(request.POST or None)
     if form.is_valid():
         obj = form.save(commit=False)
@@ -317,10 +317,10 @@ def unit_add(request:HttpRequest):
 @login_required
 def unit_edit(request:HttpRequest,id):
     user = request.user
-    if not user.is_superuser:
-        msg = "You don't have the required permission."
-        messages.error(request,msg)
-        return redirect('unit_list')
+    # if not user.is_superuser:
+    #     msg = "You don't have the required permission."
+    #     messages.error(request,msg)
+    #     return redirect('unit_list')
     instance = Unit.objects.get(id=id)
     form = UnitForm(request.POST or None,instance=instance)
     if form.is_valid():

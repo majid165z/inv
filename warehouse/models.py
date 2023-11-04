@@ -66,7 +66,7 @@ class Unit(models.Model):
         verbose_name = "واحد"
         verbose_name_plural = "واحد ها"
     def __str__(self) -> str:
-        return f'{self.name} ({self.abrv})'
+        return f'{self.abrv}'
     def save(self,*args,**kwargs):
         self.abrv = str(self.abrv).upper()
         super().save(*args, **kwargs)
