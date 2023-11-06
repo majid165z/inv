@@ -57,9 +57,20 @@
 <script>
     let table = $('table').DataTable(
         {
-        "lengthMenu": [ 25, 50, 75, 100 ]
+        "lengthMenu": [ 25, 50, 75, 100 ],
+        //"searching": false
+        "columns": [
+        { "searchable": false },
+        null,
+        { "searchable": false },
+        { "searchable": false },
+        { "searchable": false },
+        { "searchable": false },
+    ]
+        
         }
     )
+    
     $('body').on('click','.delete',function(event){
         let target = event.currentTarget
         let id = target.getAttribute("data-id")

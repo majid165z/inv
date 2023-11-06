@@ -36,10 +36,10 @@ from django.forms import inlineformset_factory
 @login_required
 def warehouse_list(request:HttpRequest):
     user = request.user
-    if not user.is_superuser:
-        msg = "You don't have the required permission."
-        messages.error(request,msg)
-        return redirect('home')
+    # if not user.is_superuser:
+    #     msg = "You don't have the required permission."
+    #     messages.error(request,msg)
+    #     return redirect('home')
     warehouses = Warehouse.objects.all()
     context = {'warehouses':warehouses}
     return render(request,'warehouse/list.html',context)
@@ -67,10 +67,10 @@ def warehouse_add(request:HttpRequest):
 @login_required
 def warehouse_edit(request:HttpRequest,id):
     user = request.user
-    if not user.is_superuser:
-        msg = "You don't have the required permission."
-        messages.error(request,msg)
-        return redirect('warehouse_list')
+    # if not user.is_superuser:
+    #     msg = "You don't have the required permission."
+    #     messages.error(request,msg)
+    #     return redirect('warehouse_list')
     warehouse = Warehouse.objects.get(id=id)
     form = WarehouseForm(request.POST or None,instance=warehouse)
     if request.method == 'POST' and form.is_valid():
@@ -104,10 +104,10 @@ def category_list(request:HttpRequest):
 @login_required
 def category_add(request:HttpRequest):
     user = request.user
-    if not user.is_superuser:
-        msg = "You don't have the required permission."
-        messages.error(request,msg)
-        return redirect('category_list')
+    # if not user.is_superuser:
+    #     msg = "You don't have the required permission."
+    #     messages.error(request,msg)
+    #     return redirect('category_list')
     form = CategoryForm(request.POST or None)
     if form.is_valid():
         obj = form.save(commit=False)
@@ -124,10 +124,10 @@ def category_add(request:HttpRequest):
 @login_required
 def category_edit(request:HttpRequest,id):
     user = request.user
-    if not user.is_superuser:
-        msg = "You don't have the required permission."
-        messages.error(request,msg)
-        return redirect('category_list')
+    # if not user.is_superuser:
+    #     msg = "You don't have the required permission."
+    #     messages.error(request,msg)
+    #     return redirect('category_list')
     instance = Category.objects.get(id=id)
     form = CategoryForm(request.POST or None,instance=instance)
     if form.is_valid():
@@ -346,10 +346,10 @@ def project_list(request:HttpRequest):
 @login_required
 def project_add(request:HttpRequest):
     user = request.user
-    if not user.is_superuser:
-        msg = "You don't have the required permission."
-        messages.error(request,msg)
-        return redirect('project_list')
+    # if not user.is_superuser:
+    #     msg = "You don't have the required permission."
+    #     messages.error(request,msg)
+    #     return redirect('project_list')
     form = ProjectForm(request.POST or None)
     if form.is_valid():
         obj = form.save(commit=False)
@@ -367,10 +367,10 @@ def project_add(request:HttpRequest):
 @login_required
 def project_edit(request:HttpRequest,id):
     user = request.user
-    if not user.is_superuser:
-        msg = "You don't have the required permission."
-        messages.error(request,msg)
-        return redirect('project_list')
+    # if not user.is_superuser:
+    #     msg = "You don't have the required permission."
+    #     messages.error(request,msg)
+    #     return redirect('project_list')
     project = Project.objects.get(id=id)
     form = ProjectForm(request.POST or None,instance=project)
     if form.is_valid():

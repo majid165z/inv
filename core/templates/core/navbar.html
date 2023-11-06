@@ -33,7 +33,7 @@
           </ul>
         </li>
         {% endif %}
-        {% if request.user.is_authenticated and request.user.is_superuser %}
+        {% if request.user.is_authenticated  %}
         <li class="nav-item dropdown">
           <a
             class="nav-link dropdown-toggle"
@@ -118,7 +118,7 @@
             </ul>
           </li>          
           {% endif %}
-          {% if request.user.is_superuser or request.user.warehouse_keeper %}
+          {% if request.user.is_superuser or request.user.warehouse_keeper or request.user.technical %}
           <li class="nav-item dropdown">
             <a
               class="nav-link dropdown-toggle"

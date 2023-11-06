@@ -1,5 +1,21 @@
 {% extends 'core/base.html' %}
+{% block css %}
+<style>
+    .select2-container .select2-selection--single .select2-selection__rendered {
+        
 
+    }
+    .select2-container .select2-selection--single:hover {
+        height: unset !important;
+        
+    }
+
+    .select2-container .select2-selection--single:hover .select2-selection__rendered {
+        white-space: unset !important
+        
+    }
+</style>
+{% endblock %}
 {% block content %}
 
 <form action="" method="POST" id="myForm"
