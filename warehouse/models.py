@@ -392,34 +392,39 @@ class inventoryItem(models.Model):
         
     def __str__(self) -> str:
         return self.item.name
-# class MaterialIssueRequest(models.Model):
-#     project = models.ForeignKey(Project,verbose_name='Project',null=True,blank=True,
-#         on_delete=models.SET_NULL,related_name='mir')
-#     number = models.CharField('MIR Number',max_length=200)
+
+class MIRManager(models.Manager):
+    def get_queryset(self):
+        return super().get_queryset().select_related('project','warehouse','created_by')
+
+class MaterialIssueRequest(models.Model):
+    project = models.ForeignKey(Project,verbose_name='Project',null=True,blank=True,
+        on_delete=models.SET_NULL,related_name='mirs')
+    number = models.CharField('MIR Number',max_length=200)
 #     mr = models.ForeignKey(MaterialRequisition,related_name='mir',on_delete=models.CASCADE,verbose_name='MR Number')
-#     po = models.ForeignKey(ProcurementOrder,related_name='mir',on_delete=models.CASCADE,verbose_name='PO Number')
-#     pl = models.ForeignKey(PackingList,related_name='mir',on_delete=models.CASCADE,verbose_name='Packing List Number')
-#     warehouse = models.ForeignKey(Warehouse,related_name='mir',on_delete=models.CASCADE,verbose_name='Origin(From)')
-#     issue_date = models.DateField('Issue Date',blank=True)
-#     required_date = models.DateField('Required Date',blank=True)
-#     client_department = models.CharField("Client Department",max_length=100)
-#     sent_to_warehouse = models.BooleanField("sent to warehouse",default=False)
-#     sent_to_location = models.BooleanField("sent to location",default=False)
-#     location = models.CharField("Destination",max_length=100,blank=True)
-#     created_by = models.ForeignKey(settings.AUTH_USER_MODEL,
-#         verbose_name='ثبت شده توسط',null=True,on_delete=models.SET_NULL,
-#         related_name='mir')
-#     created = models.DateTimeField(auto_now=False,auto_now_add=True)
-#     updated = models.DateTimeField(auto_now=True,auto_now_add=False)
-#     objects = PackingListManager()
-#     class Meta:
-#         verbose_name = "Material Issue Request"
-#         verbose_name_plural = "Material Issue Requests"
-#         ordering = ['-created']
-#     def __str__(self) -> str:
-#         return self.number
-#     def get_edit_url(self):
-#         return reverse('mir_edit',kwargs={'id':self.id}) 
+    po = models.ForeignKey(ProcurementOrder,related_name='mir',on_delete=models.CASCADE,verbose_name='PO Number')
+    pl = models.ForeignKey(PackingList,related_name='mir',on_delete=models.CASCADE,verbose_name='Packing List Number')
+    warehouse = models.ForeignKey(Warehouse,related_name='mirs',on_delete=models.CASCADE,verbose_name='Origin(From)')
+    issue_date = models.DateField('Issue Date',blank=True)
+    required_date = models.DateField('Required Date',blank=True)
+    client_department = models.CharField("Client Department",max_length=100)
+    sent_to_warehouse = models.BooleanField("sent to warehouse",default=False)
+    sent_to_location = models.BooleanField("sent to location",default=False)
+    location = models.CharField("Destination",max_length=100,blank=True)
+    created_by = models.ForeignKey(settings.AUTH_USER_MODEL,
+        verbose_name='ثبت شده توسط',null=True,on_delete=models.SET_NULL,
+        related_name='mirs')
+    created = models.DateTimeField(auto_now=False,auto_now_add=True)
+    updated = models.DateTimeField(auto_now=True,auto_now_add=False)
+    objects = MIRManager()
+    class Meta:
+        verbose_name = "Material Issue Request"
+        verbose_name_plural = "Material Issue Requests"
+        ordering = ['-created']
+    def __str__(self) -> str:
+        return self.number
+    def get_edit_url(self):
+        return reverse('mir_edit',kwargs={'id':self.id}) 
 #     def save(self,*args,**kwargs):
 #         super().save(*args,**kwargs)
 #         if self.sent_to_location:

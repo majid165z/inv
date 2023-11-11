@@ -599,10 +599,10 @@ def condition_list(request:HttpRequest):
 @login_required
 def condition_add(request:HttpRequest):
     user = request.user
-    if not user.is_superuser:
-        msg = "You don't have the required permission."
-        messages.error(request,msg)
-        return redirect('condition_list')
+    # if not user.is_superuser:
+    #     msg = "You don't have the required permission."
+    #     messages.error(request,msg)
+    #     return redirect('condition_list')
     form = ConditionForm(request.POST or None)
     if form.is_valid():
         obj = form.save(commit=False)
@@ -619,10 +619,10 @@ def condition_add(request:HttpRequest):
 @login_required
 def condition_edit(request:HttpRequest,id):
     user = request.user
-    if not user.is_superuser:
-        msg = "You don't have the required permission."
-        messages.error(request,msg)
-        return redirect('condition_list')
+    # if not user.is_superuser:
+    #     msg = "You don't have the required permission."
+    #     messages.error(request,msg)
+    #     return redirect('condition_list')
     instance = Condition.objects.get(id=id)
     form = ConditionForm(request.POST or None,instance=instance)
     if form.is_valid():

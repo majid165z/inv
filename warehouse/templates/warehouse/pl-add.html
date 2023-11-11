@@ -1,5 +1,21 @@
 {% extends 'core/base.html' %}
+{% block css %}
+<style>
+    .select2-container .select2-selection--single .select2-selection__rendered {
+        
 
+    }
+    .select2-container .select2-selection--single:hover {
+        height: unset !important;
+        
+    }
+
+    .select2-container .select2-selection--single:hover .select2-selection__rendered {
+        white-space: unset !important
+        
+    }
+</style>
+{% endblock %}
 {% block content %}
 
 <form action="" method="POST" id="myForm"
@@ -66,18 +82,6 @@ class="row flex justify-content-center align-content-center align-items-center">
 <script>
     $.noConflict();
 
-    $("body").on('select2:select', function (e) {
-        let data = e.params.data;
-        data = data.text.split(": (");
-        if (data.length > 1){
-            let quantity = Number(data[data.length-1].split(')')[0])
-            let id = e.target.id
-            id = id.replace("po_item","quantity")
-            let qInp = document.querySelector("#"+id)
-            qInp.setAttribute("max",quantity)
-        }
-    });
-
     $('body').on('click','.delete',function(event){
         $(event.currentTarget).next().click()
         event.currentTarget.closest(".form-row").style.display = 'none'
@@ -89,20 +93,6 @@ class="row flex justify-content-center align-content-center align-items-center">
         {% if pl %}
         $('#id_po,#id_project').prop('disabled', true);
         $('input[type=checkbox]').hide()
-        $('.actives select').each(function(index,element){
-            let id = element.id
-            let value = element.value
-            if (value){
-                let new_id = id.replace("po_item","quantity")
-                let optionText = $("option:selected", element).text()
-                data = optionText.split(": (");
-                if (data.length > 1){
-                    let quantity = Number(data[data.length-1].split(')')[0])
-                    let qInp = document.querySelector("#"+new_id)
-                    qInp.setAttribute("max",quantity)
-                }
-            }
-        })
         $('.actives select').select2()
         $('select').addClass('form-select')
         $(".select2-container").addClass("w-100")
