@@ -11,14 +11,14 @@ from .forms import (UnitForm,ProjectForm,
     CategoryForm,ClusterForm,PipeLineForm,
     MrNumberForm
     )
-from django.http import HttpRequest,JsonResponse
+from django.http import HttpRequest,JsonResponse,HttpResponse
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 from .models import (Project,
                     #  MaterialRequisition, MrItem,
                      Unit, Warehouse,Item,
 POItem, ProcurementOrder,
-PackingList,
+PackingList,PLItem,
 MaterialReceiptSheet,MRSItem,
 Condition,
 inventoryItem,
@@ -30,7 +30,8 @@ MrNumber
 from django.db.models import Sum, Q
 from django.views.decorators.csrf import csrf_exempt
 from django.forms import inlineformset_factory
-
+import io
+import xlsxwriter
 # Create your views here.
 
 @login_required
@@ -409,12 +410,61 @@ def po_list(request:HttpRequest):
                 "msg":"This PO have been used by some PLs. You should delete does Pls first."
             })
     else:
-        pos = ProcurementOrder.objects.all()
-        context = {
+        project = request.GET.get('project',None)
+        get_file = request.GET.get('get_file',None)
+        projects = Project.objects.all()
+        if project:
+            pos = ProcurementOrder.objects.filter(project__id=project)
+            items = POItem.objects.filter(po__project__id=project)
+        else:
+            pos = ProcurementOrder.objects.all()
+            items = items = POItem.objects.all()
+        
+        if get_file:
+            output = io.BytesIO()
+            workbook = xlsxwriter.Workbook(output)
+            worksheet = workbook.add_worksheet()
+            i = 0
+            worksheet.write(i,0,"PO Number")
+            worksheet.write(i,1,"Project")
+            worksheet.write(i,2,"Seller(Company)")
+            worksheet.write(i,3,"Item")
+            worksheet.write(i,4,"Unit")
+            worksheet.write(i,5,"Cluster")
+            worksheet.write(i,6,"Pipe Line")
+            worksheet.write(i,7,"Quantity")
+            worksheet.write(i,8,"created(Date)")
+            i=1
+            for item in items:
+                worksheet.write(i,0,item.po.number)
+                worksheet.write(i,1,item.po.project.name)
+                if item.po.company:
+                    worksheet.write(i,2,item.po.company)
+                worksheet.write(i,3,item.item.name)
+                worksheet.write(i,4,item.unit.abrv)
+                if item.cluster:
+                    worksheet.write(i,5,item.cluster.name)
+                if item.pipeline:
+                    worksheet.write(i,6,item.pipeline.name)
+                worksheet.write(i,7,item.quantity)
+                worksheet.write(i,8,item.created.strftime("%Y/%m/%d"))
+                i += 1
+            workbook.close()
+            output.seek(0)
+            filename = "po.xlsx"
+            response = HttpResponse(
+                output,
+                content_type="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+            )
+            response["Content-Disposition"] = "attachment; filename=%s" % filename
+            return response        
+    context = {
             'title':'PO List',
-            'pos':pos
+            'pos':pos,
+            'project_id':int(project) if project else None,
+            'projects':projects
         }
-        return render(request,'warehouse/po-list.html',context)
+    return render(request,'warehouse/po-list.html',context)
 
 @login_required
 def po_add(request:HttpRequest):
@@ -525,11 +575,63 @@ def pl_list(request:HttpRequest):
                 "msg":"This PL have been used by some MRS. You should delete does MRS first."
             })
     else:
+        project = request.GET.get('project',None)
+        get_file = request.GET.get('get_file',None)
+        projects = Project.objects.all()
+        if project:
+            pls = PackingList.objects.filter(project__id=project)
+            items = PLItem.objects.filter(pl__project__id=project)
+        else:
+            pls = PackingList.objects.all()
+            items = items = PLItem.objects.all()
+        
+        if get_file:
+            output = io.BytesIO()
+            workbook = xlsxwriter.Workbook(output)
+            worksheet = workbook.add_worksheet()
+            i = 0
+            worksheet.write(i,0,"PL Number")
+            worksheet.write(i,1,"Project")
+            worksheet.write(i,2,"PO Num.")
+            worksheet.write(i,3,"Item")
+            worksheet.write(i,4,"Company")
+            worksheet.write(i,5,"Unit")
+            worksheet.write(i,6,"Cluster")
+            worksheet.write(i,7,"Pipe Line")
+            worksheet.write(i,8,"Quantity")
+            worksheet.write(i,9,"created(Date)")
+            i=1
+            for item in items:
+                worksheet.write(i,0,item.pl.number)
+                worksheet.write(i,1,item.pl.project.name)
+                worksheet.write(i,2,item.pl.po.number)
+                if item.pl.company:
+                    worksheet.write(i,4,item.pl.company)
+                worksheet.write(i,3,item.po_item.item.name)
+                worksheet.write(i,5,item.po_item.unit.abrv)
+                if item.po_item.cluster:
+                    worksheet.write(i,6,item.po_item.cluster.name)
+                if item.po_item.pipeline:
+                    worksheet.write(i,7,item.po_item.pipeline.name)
+                worksheet.write(i,8,item.quantity)
+                worksheet.write(i,9,item.created.strftime("%Y/%m/%d"))
+                i += 1
+            workbook.close()
+            output.seek(0)
+            filename = "pl.xlsx"
+            response = HttpResponse(
+                output,
+                content_type="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+            )
+            response["Content-Disposition"] = "attachment; filename=%s" % filename
+            return response        
 
-        pls = PackingList.objects.all()
+
         context = {
             'title':'Packing List',
-            'pls':pls
+            'pls':pls,
+            'projects':projects,
+            'project_id':int(project) if project else None
         }
     return render(request,'warehouse/pl-list.html',context)
 
@@ -638,7 +740,71 @@ def condition_edit(request:HttpRequest,id):
 
 @login_required
 def mrs_list(request:HttpRequest):
-    mrss = MaterialReceiptSheet.objects.all()
+    
+    project = request.GET.get('project',None)
+    get_file = request.GET.get('get_file',None)
+    projects = Project.objects.all()
+    if project:
+        mrss = MaterialReceiptSheet.objects.filter(project__id=project)
+        items = MRSItem.objects.filter(mrs__project__id=project)
+    else:
+        mrss = MaterialReceiptSheet.objects.all()
+        items = MRSItem.objects.all()
+    
+    if get_file:
+        output = io.BytesIO()
+        workbook = xlsxwriter.Workbook(output)
+        worksheet = workbook.add_worksheet()
+        i = 0
+        worksheet.write(i,0,"MRS Number")
+        worksheet.write(i,1,"Project")
+        worksheet.write(i,2,"PO Num.")
+        worksheet.write(i,3,"PL Num.")
+        worksheet.write(i,4,"Item")
+        worksheet.write(i,5,"Company")
+        worksheet.write(i,6,"Unit")
+        worksheet.write(i,7,"Cluster")
+        worksheet.write(i,8,"Pipe Line")
+        worksheet.write(i,9,"Quantity")
+        worksheet.write(i,10,"created(Date)")
+        worksheet.write(i,11,"Condition")
+        worksheet.write(i,12,"Location")
+        
+        i=1
+        for item in items:
+            worksheet.write(i,0,item.mrs.number)
+            worksheet.write(i,1,item.mrs.project.name)
+            worksheet.write(i,2,item.mrs.po.number)
+            worksheet.write(i,3,item.mrs.pl.number)
+            if item.mrs.vendor:
+                worksheet.write(i,5,item.mrs.vendor)
+            worksheet.write(i,4,item.pl_item.po_item.item.name)
+            worksheet.write(i,6,item.pl_item.po_item.unit.abrv)
+            if item.pl_item.po_item.cluster:
+                worksheet.write(i,7,item.pl_item.po_item.cluster.name)
+            if item.pl_item.po_item.pipeline:
+                worksheet.write(i,8,item.pl_item.po_item.pipeline.name)
+            worksheet.write(i,9,item.quantity)
+            worksheet.write(i,10,item.created.strftime("%Y/%m/%d"))
+            worksheet.write(i,11,item.condition.name)
+            worksheet.write(i,12,item.loc)
+            
+            i += 1
+        workbook.close()
+        output.seek(0)
+        filename = "mrs.xlsx"
+        response = HttpResponse(
+            output,
+            content_type="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+        )
+        response["Content-Disposition"] = "attachment; filename=%s" % filename
+        return response        
+    
+    
+    
+    
+    
+    
     context = {
         'title':'Material Receipt Sheet List',
         'mrss':mrss

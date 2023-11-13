@@ -1,5 +1,36 @@
-{% extends 'core/base.html' %} {% block content %}
+{% extends 'core/base.html' %} 
+{% block css %}
+<style>
+    .p_q::before{
+        content: "-";
+        color: white;
+    }
+</style>
+{% endblock css %}
+{% block content %}
 {% load jalali_tags %}
+<div class="col-12 col-md-10 rounded p-5 mx-auto bg-white mb-1">
+    <form action="" method="get">
+        <div class="row">
+            <div class="col-6">
+                <p>Project:</p>
+                <select name="project">
+                    <option value="" {% if not project_id %}selected {% endif %}>------</option>
+                    {% for project in projects %}
+                    <option value="{{project.id}}" {% if project.id == project_id %}selected {% endif %}>{{project}}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="col-6">
+                <p class="p_q" ></p>
+                <input class="btn btn-primary" type="submit" value="Filter" name="filter">
+                <input class="btn btn-secondary" type="submit" value="Download" name="get_file">
+
+            </div>
+        </div>
+    </form>
+</div>
+
 <div class="col-12 col-md-10 rounded p-5 mx-auto bg-white">
     <a class="btn btn-primary" style="float: right;" href="{% url 'mrs_add' %}">+
         Create MRS   
@@ -12,7 +43,6 @@
                 <th scope="col">#</th>
                 <th scope="col">MRS Number</th>
                 <th scope="col">Project</th>
-                <th scope="col">MR Number</th>
                 <th scope="col">PO Number</th>
                 <th scope="col">PL Number</th>
                 <th scope="col">Warehouse</th>
@@ -27,7 +57,6 @@
                 <th scope="row">{{forloop.counter}}</th>
                 <td><a href="{{mrs.get_edit_url}}">{{mrs.number}}</a></td>
                 <td>{{mrs.project}}</td>
-                <td>{{mrs.mr}}</td>
                 <td>{{mrs.po}}</td>
                 <td>{{mrs.pl}}</td>
                 <td>{{mrs.warehouse}}</td>
@@ -51,7 +80,18 @@
 <script>
     $('table').DataTable(
         {
-        "lengthMenu": [ 25, 50, 75, 100 ]
+        "lengthMenu": [ 25, 50, 75, 100 ],
+        "columns": [
+        { "searchable": false },
+        null,
+        { "searchable": false },
+        { "searchable": false },
+        { "searchable": false },
+        { "searchable": false },
+        { "searchable": false },
+        { "searchable": false },
+    ]
+
         }
     );
 </script>

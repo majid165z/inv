@@ -340,6 +340,7 @@ class MRSItem(models.Model):
             warehouse = self.mrs.warehouse,
             item = self.pl_item.po_item.item,
             condition=self.condition,
+            unit = self.pl_item.po_item.unit,
             cluster = self.pl_item.po_item.cluster if self.pl_item.po_item.cluster else None,
             pipeline = self.pl_item.po_item.pipeline if self.pl_item.po_item.pipeline else None,
             )
@@ -351,6 +352,7 @@ class MRSItem(models.Model):
                 mrs__warehouse = self.mrs.warehouse,
                 pl_item__po_item__item = self.pl_item.po_item.item,
                 condition=self.condition,
+                pl_item__po_item__unit = self.pl_item.po_item.unit,
                 pl_item__po_item__cluster = self.pl_item.po_item.cluster if self.pl_item.po_item.cluster else None,
                 pl_item__po_item__pipeline = self.pl_item.po_item.pipeline if self.pl_item.po_item.pipeline else None,
                 ).aggregate(total=Sum('quantity'))['total']
@@ -361,7 +363,7 @@ class MRSItem(models.Model):
         super().delete()
 class InventoryItemManager(models.Manager):
     def get_queryset(self):
-        return super().get_queryset().select_related('project','warehouse','item')
+        return super().get_queryset().select_related('project','warehouse','item','unit','condition','cluster','pipeline')
 
 class inventoryItem(models.Model):
     project = models.ForeignKey(Project,verbose_name='Project',null=True,blank=True,
@@ -374,6 +376,7 @@ class inventoryItem(models.Model):
     incoming = models.DecimalField('incoming',max_digits=10,decimal_places=3,default=0)
     outgoing = models.DecimalField('outgoing',max_digits=10,decimal_places=3,default=0)
     remaining = models.DecimalField('remaining',max_digits=10,decimal_places=3,default=0)
+    unit = models.ForeignKey(Unit,blank=True,null=True,on_delete=models.SET_NULL,verbose_name="unit",related_name='ivitems')
     objects = InventoryItemManager()
     total_in_all_warehouse_project = models.DecimalField('total_in_all_warehouse_project',max_digits=10,decimal_places=3,default=0)
     total_in_all = models.DecimalField('total_in_all',max_digits=10,decimal_places=3,default=0)
@@ -384,10 +387,10 @@ class inventoryItem(models.Model):
         self.remaining = self.incoming - self.outgoing
         super().save(*args,**kwargs)
         
-        inventoryItem.objects.filter(item=self.item,project=self.project,condition=self.condition).update(
-             total_in_all_warehouse_project=inventoryItem.objects.filter(item=self.item,project=self.project,condition=self.condition).aggregate(total=Sum('remaining'))['total'])
+        inventoryItem.objects.filter(item=self.item,project=self.project,condition=self.condition,unit=self.unit).update(
+             total_in_all_warehouse_project=inventoryItem.objects.filter(item=self.item,project=self.project,condition=self.condition,unit=self.unit).aggregate(total=Sum('remaining'))['total'])
         inventoryItem.objects.filter(item=self.item,condition=self.condition).update(
-             total_in_all=inventoryItem.objects.filter(item=self.item,condition=self.condition).aggregate(total=Sum('remaining'))['total'])
+             total_in_all=inventoryItem.objects.filter(item=self.item,condition=self.condition,unit=self.unit).aggregate(total=Sum('remaining'))['total'])
                 
         
     def __str__(self) -> str:
@@ -397,34 +400,34 @@ class MIRManager(models.Manager):
     def get_queryset(self):
         return super().get_queryset().select_related('project','warehouse','created_by')
 
-class MaterialIssueRequest(models.Model):
-    project = models.ForeignKey(Project,verbose_name='Project',null=True,blank=True,
-        on_delete=models.SET_NULL,related_name='mirs')
-    number = models.CharField('MIR Number',max_length=200)
+# class MaterialIssueRequest(models.Model):
+#     project = models.ForeignKey(Project,verbose_name='Project',null=True,blank=True,
+#         on_delete=models.SET_NULL,related_name='mirs')
+#     number = models.CharField('MIR Number',max_length=200)
 #     mr = models.ForeignKey(MaterialRequisition,related_name='mir',on_delete=models.CASCADE,verbose_name='MR Number')
-    po = models.ForeignKey(ProcurementOrder,related_name='mir',on_delete=models.CASCADE,verbose_name='PO Number')
-    pl = models.ForeignKey(PackingList,related_name='mir',on_delete=models.CASCADE,verbose_name='Packing List Number')
-    warehouse = models.ForeignKey(Warehouse,related_name='mirs',on_delete=models.CASCADE,verbose_name='Origin(From)')
-    issue_date = models.DateField('Issue Date',blank=True)
-    required_date = models.DateField('Required Date',blank=True)
-    client_department = models.CharField("Client Department",max_length=100)
-    sent_to_warehouse = models.BooleanField("sent to warehouse",default=False)
-    sent_to_location = models.BooleanField("sent to location",default=False)
-    location = models.CharField("Destination",max_length=100,blank=True)
-    created_by = models.ForeignKey(settings.AUTH_USER_MODEL,
-        verbose_name='ثبت شده توسط',null=True,on_delete=models.SET_NULL,
-        related_name='mirs')
-    created = models.DateTimeField(auto_now=False,auto_now_add=True)
-    updated = models.DateTimeField(auto_now=True,auto_now_add=False)
-    objects = MIRManager()
-    class Meta:
-        verbose_name = "Material Issue Request"
-        verbose_name_plural = "Material Issue Requests"
-        ordering = ['-created']
-    def __str__(self) -> str:
-        return self.number
-    def get_edit_url(self):
-        return reverse('mir_edit',kwargs={'id':self.id}) 
+#     po = models.ForeignKey(ProcurementOrder,related_name='mir',on_delete=models.CASCADE,verbose_name='PO Number')
+#     pl = models.ForeignKey(PackingList,related_name='mir',on_delete=models.CASCADE,verbose_name='Packing List Number')
+#     warehouse = models.ForeignKey(Warehouse,related_name='mirs',on_delete=models.CASCADE,verbose_name='Origin(From)')
+#     issue_date = models.DateField('Issue Date',blank=True)
+#     required_date = models.DateField('Required Date',blank=True)
+#     client_department = models.CharField("Client Department",max_length=100)
+#     sent_to_warehouse = models.BooleanField("sent to warehouse",default=False)
+#     sent_to_location = models.BooleanField("sent to location",default=False)
+#     location = models.CharField("Destination",max_length=100,blank=True)
+#     created_by = models.ForeignKey(settings.AUTH_USER_MODEL,
+#         verbose_name='ثبت شده توسط',null=True,on_delete=models.SET_NULL,
+#         related_name='mirs')
+#     created = models.DateTimeField(auto_now=False,auto_now_add=True)
+#     updated = models.DateTimeField(auto_now=True,auto_now_add=False)
+#     objects = MIRManager()
+#     class Meta:
+#         verbose_name = "Material Issue Request"
+#         verbose_name_plural = "Material Issue Requests"
+#         ordering = ['-created']
+#     def __str__(self) -> str:
+#         return self.number
+#     def get_edit_url(self):
+#         return reverse('mir_edit',kwargs={'id':self.id}) 
 #     def save(self,*args,**kwargs):
 #         super().save(*args,**kwargs)
 #         if self.sent_to_location:
