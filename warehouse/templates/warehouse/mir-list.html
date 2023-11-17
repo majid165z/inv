@@ -20,7 +20,6 @@
                 <th scope="col">#</th>
                 <th scope="col">MIR Number</th>
                 <th scope="col">Project</th>
-                <th scope="col">MR Number</th>
                 <th scope="col">PO Number</th>
                 <th scope="col">PL Number</th>
                 <th scope="col">Warehouse</th>
@@ -36,7 +35,6 @@
                 <th scope="row">{{forloop.counter}}</th>
                 <td><a href="{% if not mrs.sent_to_warehouse %}{{mrs.get_edit_url}}{% else %}#{% endif %}">{{mrs.number}}</a></td>
                 <td>{{mrs.project}}</td>
-                <td>{{mrs.mr}}</td>
                 <td>{{mrs.po}}</td>
                 <td>{{mrs.pl}}</td>
                 <td>{{mrs.warehouse}}</td>

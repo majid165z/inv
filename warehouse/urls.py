@@ -75,6 +75,7 @@ urlpatterns = [
     path('ajax/get_mir_formset',views.get_mir_formset,name='get_mir_formset'),
     path('ajax/get_pl_warehouse',views.get_pl_warehouse,name='get_pl_warehouse'),
     path('ajax/get_mir_details',views.get_mir_details,name='get_mir_details'),
-    path('ajax/get_items_ajax',views.get_items_ajax,name='get_items_ajax')
+    path('ajax/get_items_ajax',views.get_items_ajax,name='get_items_ajax'),
+    path('ajax/get_mrs_items',views.get_mrs_items,name='get_mrs_items'),
     # path('get_po_items',views.get_po_items,name='get_po_items'),
 ]

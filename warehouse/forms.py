@@ -5,7 +5,7 @@ from .models import (Item,Warehouse,Unit,Project,
                     PackingList,PLItem,
                     MaterialReceiptSheet,MRSItem,
                     Condition,
-                    # MaterialIssueRequest,MIRItem,
+                    MaterialIssueRequest,MIRItem,
                     Category,Cluster,PipeLine,
                     MrNumber
     )
@@ -165,38 +165,36 @@ class ConditionForm(forms.ModelForm):
         model = Condition
         fields = ['name',]
 
-# class MaterialIssueRequestForm(forms.ModelForm):
-#     class Meta:
-#         model = MaterialIssueRequest
-#         fields = ['project','number','mr','po','pl','warehouse','issue_date','required_date','client_department','location']
-#     def __init__(self, *args, **kwargs):
-#         super().__init__(*args, **kwargs)
-#         if self.instance.pk:
-#             self.fields['mr'].queryset = self.fields['mr'].queryset.filter(project=self.instance.project)
-#             self.fields['po'].queryset = self.fields['po'].queryset.filter(mr=self.instance.mr)
-#             self.fields['pl'].queryset = self.fields['pl'].queryset.filter(mr=self.instance.mr)
-#         self.fields['issue_date'] = JalaliDateField(label='Issue Date', 
-#             widget=AdminJalaliDateWidget 
-#         )
-#         self.fields['required_date'] = JalaliDateField(label='Required Date', 
-#             widget=AdminJalaliDateWidget 
-#         )
+class MaterialIssueRequestForm(forms.ModelForm):
+    class Meta:
+        model = MaterialIssueRequest
+        fields = ['project','number','po','pl','mrs','warehouse','issue_date','required_date','client_department','location']
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        if self.instance.pk:
+            self.fields['po'].queryset = self.fields['po'].queryset.filter(project=self.instance.project)
+            self.fields['pl'].queryset = self.fields['pl'].queryset.filter(po=self.instance.po)
+            self.fields['mrs'].queryset = self.fields['mrs'].queryset.filter(pl=self.instance.pl)
+        self.fields['issue_date'] = JalaliDateField(label='Issue Date', 
+            widget=AdminJalaliDateWidget 
+        )
+        self.fields['required_date'] = JalaliDateField(label='Required Date', 
+            widget=AdminJalaliDateWidget 
+        )
 
-# class MIRItemForm(forms.ModelForm):
-#     class Mata:
-#         model = MIRItem
-#         fields = ['number','item','unit','quantity','remarks','condition']
-#     def __init__(self, *args, **kwargs):
-#         pl = kwargs.pop('pl',None)
-#         super().__init__(*args, **kwargs)
-#         if pl:
-#             plitems = list(pl.items.all().values_list('number',flat=True))
-#             mr_items = [("","-------")] + list(MrItem.objects.filter(id__in=plitems).values_list('id','number'))
-#             self.fields['number'].widget = forms.Select(choices=mr_items)
-#             self.fields['item'].queryset = Item.objects.filter(plitems__pl=pl)
+class MIRItemForm(forms.ModelForm):
+    class Mata:
+        model = MIRItem
+        fields = ['mrs_item','quantity','remarks','cluster','pipeline']
+    def __init__(self, *args, **kwargs):
+        mrs = kwargs.pop('mrs',None)
+        super().__init__(*args, **kwargs)
+        if mrs:
+            poitems = [("","--------")]+[(item.id, item.__str__()) for item in mrs.items.all()]
+            self.fields['mrs_item'].choices = poitems
 
-# MIRItemFromSet = inlineformset_factory(
-#     MaterialIssueRequest,MIRItem,form=MIRItemForm,extra=2,
-#     can_delete=True,can_delete_extra=True,
-#     fields=['number','item','unit','quantity','remarks','condition']
-# )
+MIRItemFromSet = inlineformset_factory(
+    MaterialIssueRequest,MIRItem,form=MIRItemForm,extra=2,
+    can_delete=True,can_delete_extra=True,
+    fields=['mrs_item','quantity','remarks','cluster','pipeline']
+)

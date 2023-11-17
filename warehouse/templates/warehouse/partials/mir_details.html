@@ -1,36 +1,32 @@
 <div class="col-12 row p-4" >
-    <div class="col-12 col-md-4">
-        <p class="pb-1 mb-1 text-center">Project :</p>
+    <div class="col-12 col-md-4 px-0">
+        <p class="pb-1 mb-1 text-center bg-dark-subtle">Project :</p>
         <p class="pb-1 mb-1 text-center">{{ mir.project }}</p>
     </div>
-    <div class="col-12 col-md-4">
-        <p class="pb-1 mb-1 text-center">MR Number:</p>
-        <p class="pb-1 mb-1 text-center">{{ mir.mr }}</p>
-    </div>
-    <div class="col-12 col-md-4">
-        <p class="pb-1 mb-1 text-center">PO Number:</p>
+    <div class="col-12 col-md-4 px-0">
+        <p class="pb-1 mb-1 text-center bg-dark-subtle">PO Number:</p>
         <p class="pb-1 mb-1 text-center">{{ mir.po }}</p>
     </div>
-    <div class="col-12 col-md-4">
-        <p class="pb-1 mb-1 text-center">PL Number:</p>
+    <div class="col-12 col-md-4 px-0">
+        <p class="pb-1 mb-1 text-center bg-dark-subtle">PL Number:</p>
         <p class="pb-1 mb-1 text-center">{{ mir.pl }}</p>
     </div>
-    <div class="col-12 col-md-4">
-        <p class="pb-1 mb-1 text-center">Warehouse:</p>
+    <div class="col-12 col-md-4 px-0">
+        <p class="pb-1 mb-1 text-center bg-dark-subtle">Warehouse:</p>
         <p class="pb-1 mb-1 text-center">{{ mir.warehouse }}</p>
     </div>
 
-    <div class="col-12 col-md-4">
-        <p class="pb-1 mb-1 text-center">MIR Number:</p>
+    <div class="col-12 col-md-4 px-0">
+        <p class="pb-1 mb-1 text-center bg-dark-subtle">MIR Number:</p>
         <p class="pb-1 mb-1 text-center">{{ mir.number }}</p>
     </div>
 
-    <div class="col-12 col-md-4">
-        <p class="pb-1 mb-1 text-center">Required Date:</p>
+    <div class="col-12 col-md-4 px-0">
+        <p class="pb-1 mb-1 text-center bg-dark-subtle">Required Date:</p>
         <p class="pb-1 mb-1 text-center">{{ mir.required_date }}</p>
     </div>
-    <div class="col-12 col-md-4">
-        <p class="pb-1 mb-1 text-center">Destination:</p>
+    <div class="col-12 col-md-4 px-0">
+        <p class="pb-1 mb-1 text-center bg-dark-subtle">Destination:</p>
         <p class="pb-1 mb-1 text-center">{{ mir.location }}</p>
     </div>
 
@@ -39,10 +35,8 @@
             <thead>
                 <tr>
                     <th scope="col">#</th>
-                    <th scope="col">MR Item Num.</th>
                     <th scope="col">Item description</th>
                     <th scope="col">Quantity</th>
-                    <th scope="col">Condition</th>
         
                 </tr>
             </thead>
@@ -50,15 +44,11 @@
                 {% for item in mir.items.all %}
                 <tr>
                     <th scope="row">{{forloop.counter}}</th>
-                    <td>{{item.number}}</td>
                     <td>
-                        {{item.item}}
+                        {{item.mrs_item}}
                     </td>
                     <td>
                         {{item.quantity}}                        
-                    </td>
-                    <td>
-                        {{item.condition}}
                     </td>
                 </tr>
                 {% endfor %}

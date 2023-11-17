@@ -7,7 +7,7 @@ from .forms import (UnitForm,ProjectForm,
     PackingListForm,PLItemForm,PLItemFromSet,
     MaterialReceiptSheetForm,MRSItemFromSet,
     ConditionForm,
-    # MaterialIssueRequestForm,MIRItemFromSet,
+    MaterialIssueRequestForm,MIRItemFromSet,
     CategoryForm,ClusterForm,PipeLineForm,
     MrNumberForm
     )
@@ -22,7 +22,7 @@ PackingList,PLItem,
 MaterialReceiptSheet,MRSItem,
 Condition,
 inventoryItem,
-# MaterialIssueRequest,MIRItem,
+MaterialIssueRequest,MIRItem,
 Category,
 Cluster,PipeLine,
 MrNumber
@@ -900,7 +900,7 @@ def mir_add(request:HttpRequest):
     inline_form = None
     if request.method == 'POST' and form.is_valid():
         obj = form.save(commit=False)
-        inline_form = MIRItemFromSet(request.POST,instance=obj,form_kwargs={"pl":obj.pl})
+        inline_form = MIRItemFromSet(request.POST,instance=obj,form_kwargs={"mrs":obj.mrs})
         if inline_form.is_valid():
             obj.created_by = user
             obj.save()
@@ -935,7 +935,7 @@ def mir_edit(request:HttpRequest,id):
     inline_form = None
     if request.method == 'POST' and form.is_valid():
         obj = form.save()
-        inline_form = MIRItemFromSet(request.POST,instance=mir,form_kwargs={"pl":mir.pl})
+        inline_form = MIRItemFromSet(request.POST,instance=mir,form_kwargs={"mrs":mir.mrs})
         if inline_form.is_valid():
             inline_form.save()
             msg = 'MIR was edited successfully.'
@@ -949,7 +949,7 @@ def mir_edit(request:HttpRequest,id):
     if inline_form:
         formset = inline_form
     else:
-        formset = MIRItemFromSet(request.POST or None,instance=mir,form_kwargs={"pl":mir.pl})
+        formset = MIRItemFromSet(request.POST or None,instance=mir,form_kwargs={"mrs":mir.mrs})
         formset.extra = 0
 
     context = {
@@ -1138,10 +1138,10 @@ def get_mrs_formset(request):
 
 @login_required
 def get_mir_formset(request):
-    pl_id = request.GET.get('pl_id',None)
-    if pl_id:
-        pl = PackingList.objects.get(id=pl_id)
-        formset = MIRItemFromSet(form_kwargs={'pl':pl})
+    mrs_id = request.GET.get('mrs_id',None)
+    if mrs_id:
+        mrs = MaterialReceiptSheet.objects.get(id=mrs_id)
+        formset = MIRItemFromSet(form_kwargs={'mrs':mrs})
         return render(request,'warehouse/partials/mir_form.html',context={'formset':formset})
 @login_required
 def get_pl_warehouse(request):
@@ -1181,4 +1181,10 @@ def get_items_ajax(request):
         return JsonResponse({"results":items})
     else:
         return JsonResponse({})
-    
+
+@login_required
+def get_mrs_items(request):
+    po_id = request.GET.get('pl_id',None)
+    if po_id:
+        pls = MaterialReceiptSheet.objects.filter(pl__id=po_id)
+        return render(request,'warehouse/partials/pl_items.html',context={'pls':pls})

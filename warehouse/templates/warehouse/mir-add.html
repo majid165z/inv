@@ -17,16 +17,16 @@ class="row flex justify-content-center align-content-center align-items-center">
             {{ form.project }}
         </div>
         <div class="col-12 col-md-4">
-            <p class="pb-1 mb-1 text-center">{{ form.mr.label_tag }}</p>
-            {{ form.mr }}
-        </div>
-        <div class="col-12 col-md-4">
             <p class="pb-1 mb-1 text-center">{{ form.po.label_tag }}</p>
             {{ form.po }}
         </div>
         <div class="col-12 col-md-4">
             <p class="pb-1 mb-1 text-center">{{ form.pl.label_tag }}</p>
             {{ form.pl }}
+        </div>
+        <div class="col-12 col-md-4">
+            <p class="pb-1 mb-1 text-center">{{ form.mrs.label_tag }}</p>
+            {{ form.mrs }}
         </div>
         <div class="col-12 col-md-4">
             <p class="pb-1 mb-1 text-center">{{ form.warehouse.label_tag }}</p>
@@ -63,7 +63,7 @@ class="row flex justify-content-center align-content-center align-items-center">
         </div>
         <div id="formset" class="my-3">
             {% if formset %}
-                {% include 'warehouse/partials/mrs_form.html' %}
+                {% include 'warehouse/partials/mir_form.html' %}
             {% endif %}
         </div>
 
@@ -96,9 +96,7 @@ class="row flex justify-content-center align-content-center align-items-center">
         let total_items = 0
         
         {% if mir %}
-        $('#id_mr,#id_po,#id_project,#id_pl').prop('disabled', true);
-        $("select[id$='-item']").prop('disabled',true)
-        $("select[id$='-unit']").prop('disabled',true)
+        $('#id_po,#id_project,#id_pl,#id_mrs').prop('disabled', true);
         total_items = 0
         let numberOfItems = 0
         $("input[id$='-quantity']").each(function(i,el){
@@ -111,7 +109,7 @@ class="row flex justify-content-center align-content-center align-items-center">
         $("#number_of_items").text("").text(" "+numberOfItems.toString())
 
         {% else %}
-        $('#id_mr,#id_po,#id_pl').prop('disabled', true);
+        $('#id_po,#id_pl,#id_mrs').prop('disabled', true);
         {% endif %}
 
         let addBtn = $('#add-item')
@@ -126,26 +124,6 @@ class="row flex justify-content-center align-content-center align-items-center">
             $('input[type=text],input[type=password],input[type=number],textarea').addClass('form-control');
             $('select').addClass('form-select')
         })
-        let project_select = document.getElementById("id_project")
-        project_select.addEventListener('change',function(event){
-            let project_id = this.value
-            if (project_id){
-                    $.ajax(
-                    {
-                    url : '{% url "get_project_mr" %}',
-                    method: 'get',
-                    data :{id:project_id}
-                    }
-                ).done( function (data) {
-                    document.getElementById("id_mr").innerHTML = data
-                    $('#id_mr').prop('disabled', false);
-                })
-            } else {
-                $('#id_mr').val("")
-                document.querySelector("#id_mr").dispatchEvent(new Event("change"))
-                $('#id_mr').prop('disabled', true);
-            }
-        })
 
         //re-enabling the select mr field to get submitted
         $('#myForm').on('submit', function() {
@@ -153,7 +131,7 @@ class="row flex justify-content-center align-content-center align-items-center">
 
         });
 
-        let mr_select = document.getElementById("id_mr")
+        let mr_select = document.getElementById("id_project")
         mr_select.addEventListener('change',function(event){
             let mr_id = this.value
             if (mr_id){    
@@ -203,19 +181,39 @@ class="row flex justify-content-center align-content-center align-items-center">
                 $('#id_pl').prop('disabled', true);
             }
         })
-
-        //-----
         let pl_select = document.getElementById("id_pl")
         pl_select.addEventListener('change',function(event){
             let pl_id = this.value
             if (pl_id){
+                $.ajax(
+                    {
+                    url : '{% url "get_mrs_items" %}',
+                    method: 'get',
+                    data :{pl_id:pl_id}
+                    }
+                ).done( function (data) {
+                    $('#id_mrs').html(data)
+                    $('#id_mrs').prop('disabled', false);
+                })
+                        
+            } else {
+                $('#id_mrs').val("")
+                document.querySelector("#id_mrs").dispatchEvent(new Event("change"))
+                $('#id_mrs').prop('disabled', true);
+            }
+        })
+
+        let mrs_select = document.getElementById("id_mrs")
+        mrs_select.addEventListener('change',function(event){
+            let mrs_id = this.value
+            if (mrs_id){
                 $("#warning").hide()   
                 addBtn.prop("disabled",false) 
                 $.ajax(
                     {
                     url : '{% url "get_mir_formset" %}',
                     method: 'get',
-                    data :{pl_id:pl_id}
+                    data :{mrs_id:mrs_id}
                     }
                 ).done( function (data) {
                     $("#formset").html(data)
@@ -243,6 +241,8 @@ class="row flex justify-content-center align-content-center align-items-center">
                 addBtn.prop("disabled",true)
             }
         })
+        //-----
+        
         //--------------
         // list to the change of formset number field
         document.addEventListener("change",function(event){

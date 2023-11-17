@@ -6,7 +6,8 @@ from .models import (Item,Unit,Warehouse,
                     #  MrItem,MaterialRequisition,
                      inventoryItem,MRSItem,
                     #  MaterialIssueRequest,MaterialReceiptSheet
-                    PackingList,PLItem
+                    PackingList,PLItem,
+                    MaterialIssueRequest,MIRItem
 )
 # Register your models here.
 admin.site.register(Item)
@@ -21,6 +22,9 @@ admin.site.register(MRSItem)
 # admin.site.register(MaterialReceiptSheet)
 admin.site.register(PackingList)
 admin.site.register(PLItem)
+admin.site.register(MaterialIssueRequest)
+admin.site.register(MIRItem)
+
 @admin.register(inventoryItem)
 class inventoryAdmin(admin.ModelAdmin):
     list_display = ['item','project','warehouse','incoming','outgoing','remaining','total_in_all_warehouse_project','total_in_all']
