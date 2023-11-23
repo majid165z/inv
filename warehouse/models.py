@@ -335,8 +335,8 @@ class MRSItem(models.Model):
     def __str__(self) -> str:
         return f'{self.pl_item.po_item.item.name}, {self.pl_item.po_item.unit}, {self.pl_item.po_item.cluster or " "}, {self.pl_item.po_item.pipeline or " "} : {self.quantity}, {self.condition}'
     def save(self,*args,**kwargs):
-        # if self._state.adding:
-        self.warehouse = self.mrs.warehouse
+        if self._state.adding:
+            self.warehouse = self.mrs.warehouse
         super().save(*args,**kwargs)
         iv,created = inventoryItem.objects.get_or_create(
             project = self.mrs.project,
