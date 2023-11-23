@@ -324,6 +324,7 @@ class MRSItem(models.Model):
     quantity = models.DecimalField('Quantity',max_digits=10,decimal_places=3)
     condition = models.ForeignKey(Condition,related_name='mrsitems',verbose_name='Condition',on_delete=models.CASCADE,default=1)
     loc = models.CharField('loc',max_length=10,null=True,blank=True)
+    warehouse = models.ForeignKey(Warehouse,related_name='mrsitems',on_delete=models.CASCADE,verbose_name='Warehouse')
 
     created = models.DateTimeField(auto_now=False,auto_now_add=True)
     updated = models.DateTimeField(auto_now=True,auto_now_add=False)
@@ -334,10 +335,12 @@ class MRSItem(models.Model):
     def __str__(self) -> str:
         return f'{self.pl_item.po_item.item.name}, {self.pl_item.po_item.unit}, {self.pl_item.po_item.cluster or " "}, {self.pl_item.po_item.pipeline or " "} : {self.quantity}, {self.condition}'
     def save(self,*args,**kwargs):
+        # if self._state.adding:
+        self.warehouse = self.mrs.warehouse
         super().save(*args,**kwargs)
         iv,created = inventoryItem.objects.get_or_create(
             project = self.mrs.project,
-            warehouse = self.mrs.warehouse,
+            warehouse = self.warehouse,
             item = self.pl_item.po_item.item,
             condition=self.condition,
             unit = self.pl_item.po_item.unit,
@@ -349,7 +352,7 @@ class MRSItem(models.Model):
         else:
             iv.incoming = MRSItem.objects.filter(
                 mrs__project=self.mrs.project,
-                mrs__warehouse = self.mrs.warehouse,
+                mrs__warehouse = self.warehouse,
                 pl_item__po_item__item = self.pl_item.po_item.item,
                 condition=self.condition,
                 pl_item__po_item__unit = self.pl_item.po_item.unit,
