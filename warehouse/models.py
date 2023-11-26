@@ -317,7 +317,7 @@ class MaterialReceiptSheet(models.Model):
 
 class MRSItemManager(models.Manager):
     def get_queryset(self):
-        return super().get_queryset().select_related('mrs','pl_item','condition')
+        return super().get_queryset().select_related('mrs','pl_item','condition','mrs__pl','mrs__pl__po','pl_item__po_item','pl_item__po_item__item')
 class MRSItem(models.Model):
     mrs = models.ForeignKey(MaterialReceiptSheet,related_name='items',on_delete=models.CASCADE)
     pl_item = models.ForeignKey(PLItem,on_delete=models.CASCADE,verbose_name='PO Item Num',related_name='mrsitems')
@@ -367,7 +367,7 @@ class MRSItem(models.Model):
         super().delete()
 class InventoryItemManager(models.Manager):
     def get_queryset(self):
-        return super().get_queryset().select_related('project','warehouse','item','unit','condition','cluster','pipeline')
+        return super().get_queryset().select_related('project','warehouse','item','unit','condition','cluster','pipeline').prefetch_related('mrs_items','mir_items')
 
 class inventoryItem(models.Model):
     project = models.ForeignKey(Project,verbose_name='Project',null=True,blank=True,
@@ -386,6 +386,10 @@ class inventoryItem(models.Model):
     total_in_all = models.DecimalField('total_in_all',max_digits=10,decimal_places=3,default=0)
     mrs_items= models.ManyToManyField(MRSItem,verbose_name='MRS Items')
     mir_items = models.ManyToManyField('MIRItem',verbose_name='MIR Items')
+
+    created = models.DateTimeField(auto_now=False,auto_now_add=True)
+    updated = models.DateTimeField(auto_now=True,auto_now_add=False)
+
     class Meta:
         verbose_name = "inventory Item"
         verbose_name_plural = "inventory Item"
@@ -404,7 +408,7 @@ class inventoryItem(models.Model):
 
 class MIRManager(models.Manager):
     def get_queryset(self):
-        return super().get_queryset().select_related('project','warehouse','created_by')
+        return super().get_queryset().select_related('project','warehouse','created_by','po','pl','mrs')
 
 class MaterialIssueRequest(models.Model):
     project = models.ForeignKey(Project,verbose_name='Project',null=True,blank=True,
@@ -420,11 +424,13 @@ class MaterialIssueRequest(models.Model):
     sent_to_warehouse = models.BooleanField("sent to warehouse",default=False)
     sent_to_location = models.BooleanField("sent to location",default=False)
     location = models.CharField("Destination",max_length=100,blank=True)
+    dest_warehouse = models.ForeignKey(Warehouse,related_name='mirs_dest',on_delete=models.CASCADE,verbose_name='Destination(To)',blank=True,null=True)
     created_by = models.ForeignKey(settings.AUTH_USER_MODEL,
         verbose_name='ثبت شده توسط',null=True,on_delete=models.SET_NULL,
         related_name='mirs')
     created = models.DateTimeField(auto_now=False,auto_now_add=True)
     updated = models.DateTimeField(auto_now=True,auto_now_add=False)
+    transfer = models.BooleanField('Transfered',default=False)
     objects = MIRManager()
     class Meta:
         verbose_name = "Material Issue Request"
@@ -462,7 +468,7 @@ class MaterialIssueRequest(models.Model):
 
 class MIRItemManager(models.Manager):
     def get_queryset(self):
-        return super().get_queryset().select_related('mir','mrs_item','cluster','pipeline')
+        return super().get_queryset().select_related('mir','mrs_item','cluster','pipeline','mrs_item__mrs__pl','mrs_item__mrs__pl__po')
 class MIRItem(models.Model):
     mir = models.ForeignKey(MaterialIssueRequest,related_name='items',on_delete=models.CASCADE)
     # pl_item = models.ForeignKey(PLItem,on_delete=models.CASCADE,verbose_name='PO Item Num',related_name='miritems')

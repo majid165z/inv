@@ -1,0 +1,77 @@
+<ul class="nav  nav-underline" id="detailsTab" role="tablist">
+    <li class="nav-item" role="presentation">
+      <button class="nav-link px-1 active" id="mrs-item-tab" data-bs-toggle="tab" data-bs-target="#mrs-item-tab-pane" type="button" role="tab" aria-controls="mrs-item-tab-pane" aria-selected="true">MRS Items (incomings)</button>
+    </li>
+    <li class="nav-item" role="presentation">
+      <button class="nav-link px-1" id="mir-items-tab" data-bs-toggle="tab" data-bs-target="#mir-items-tab-pane" type="button" role="tab" aria-controls="mir-items-tab-pane" aria-selected="false">MIR Items (outgoings)</button>
+    </li>
+  </ul>
+  <div class="tab-content" id="detailsTabConten">
+    <div class="tab-pane fade show active" id="mrs-item-tab-pane" role="tabpanel" aria-labelledby="mrs-item-tab" tabindex="0">
+        {% if inv.mrs_items %}
+        <table class="table table-striped">
+            <thead>
+                <tr>
+                    <th scope="col">#</th>
+                    <th scope="col">MRS Num.</th>
+                    <th scope="col">PL Num.</th>
+                    <th scope="col">PO Number</th>
+                    <th scope="col">Quantity</th>
+                    <th scope="col">Condition</th>
+                    <th scope="col">Date</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for item in inv.mrs_items.all %}
+                <tr>
+                    <th scope="row">{{forloop.counter}}</th>
+                    <td>{{item.mrs.number}}</td>
+                    <td>{{item.mrs.pl.number}}</td>
+                    <td>{{item.mrs.po.number}}</td>
+                    <td>{{item.quantity}}</td>
+                    <td>{{item.condition}}</td>
+                    <td>{{item.created}}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+            {% else %}
+        <h1>There is no MRS item submitted.</h1>
+        {% endif %}
+    </div>
+    <div class="tab-pane fade" id="mir-items-tab-pane" role="tabpanel" aria-labelledby="mir-items-tab" tabindex="0">
+        {% if inv.mir_items.all %}
+        <table class="table table-striped">
+            <thead>
+                <tr>
+                    <th scope="col">#</th>
+                    <th scope="col">MIR Num.</th>
+                    <th scope="col">MRS Num.</th>
+                    <th scope="col">PL Num.</th>
+                    <th scope="col">PO Number</th>
+                    <th scope="col">Quantity</th>
+                    <th scope="col">Cluster</th>
+                    <th scope="col">PipeLine</th>
+                    <th scope="col">Date</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for item in inv.mir_items.all %}
+                <tr>
+                    <th scope="row">{{forloop.counter}}</th>
+                    <td>{{item.mir.number}}</td>
+                    <td>{{item.mir.pl.number}}</td>
+                    <td>{{item.mir.mrs.number}}</td>
+                    <td>{{item.mir.po.number}}</td>
+                    <td>{{item.quantity}}</td>
+                    <td>{{item.cluster}}</td>
+                    <td>{{item.pipeline}}</td>
+                    <td>{{item.created}}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+            {% else %}
+        <h1 class="p-5 text-center w-100">There is no MIR item submitted.</h1>
+        {% endif %}    </div>
+  </div>

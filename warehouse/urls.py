@@ -60,7 +60,8 @@ urlpatterns = [
     path('send_to_warehouse',views.send_to_warehouse,name='send_to_warehouse'),
     path('mir-list-warehouse',views.mir_list_warehouse,name='mir_list_warehouse'),
     path('send_mir_from_warehouse',views.send_mir_from_warehouse,name='send_mir_from_warehouse'),
-    
+    # warehouse details
+    path('warehouse/details/<id>',views.warehouse_details,name='warehouse_details'),
     # AJAX calls ----------------------------------------
     path('ajax/create_item_name',views.create_item_name,name='create_item_name'),
     path('ajax/get_project_po',views.get_project_po,name='get_project_po'),
@@ -77,5 +78,6 @@ urlpatterns = [
     path('ajax/get_mir_details',views.get_mir_details,name='get_mir_details'),
     path('ajax/get_items_ajax',views.get_items_ajax,name='get_items_ajax'),
     path('ajax/get_mrs_items',views.get_mrs_items,name='get_mrs_items'),
+    path('ajax/inventory_item_details',views.inventory_item_details,name='inventory_item_details'),
     # path('get_po_items',views.get_po_items,name='get_po_items'),
 ]

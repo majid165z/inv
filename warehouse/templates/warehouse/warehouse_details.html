@@ -1,0 +1,150 @@
+{% extends 'core/base.html' %} 
+
+{% block css %}
+<style>
+    .p_q::before{
+        content: "-";
+        color: white;
+    }
+</style>
+{% endblock css %}
+{% block content %}
+{% load jalali_tags %}
+<div class="col-12 col-md-10 rounded p-5 mx-auto bg-white mb-1">
+<h2>Details for Warehouse: {{wh}}</h2>
+<h3>Address : {%if wh.address %} {{wh.address}} {% else %}The address has not been submitted {% endif %}</h3>
+
+</div>
+<div class="col-12 col-md-10 rounded p-5 mx-auto bg-white mb-1">
+    <form action="" method="get">
+        <div class="row">
+            <div class="col-6">
+                <p>Project:</p>
+                <select name="project">
+                    <option value="" {% if not project_id %}selected {% endif %}>------</option>
+                    {% for project in projects %}
+                    <option value="{{project.id}}" {% if project.id == project_id %}selected {% endif %}>{{project}}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="col-6">
+                <p class="p_q" ></p>
+                <input class="btn btn-primary" type="submit" value="Filter" name="filter">
+                <input class="btn btn-secondary" type="submit" value="Download" name="get_file">
+
+            </div>
+        </div>
+    </form>
+</div>
+<div class="col-12 col-md-10 rounded p-5 mx-auto bg-white">
+    {% if items %}
+    <table class="table table-striped">
+        <thead>
+            <tr>
+                <th scope="col">#</th>
+                <th scope="col">Item Desc.</th>
+                <th scope="col">Unit</th>
+                <th scope="col">Project</th>
+                <th scope="col">Quantity</th>
+                <th scope="col">
+                    Quantity <br>
+                    ALL Warehouses
+                    <br>
+                    (This Project)
+                </th>
+                <th scope="col">
+                    Quantity <br>
+                    ALL Projects
+                </th>
+                <th scope="col">
+                    more details
+                </th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for item in items %}
+            <tr>
+                <th scope="row">{{forloop.counter}}</th>
+                <td>{{item}}</td>
+                <td>{{item.unit}}</td>
+                <td>
+                    {{item.project}}
+                </td>
+                <td>
+                    {{item.remaining}}
+                </td>
+    
+                <td>
+                    {{item.total_in_all_warehouse_project}}
+                </td>
+    
+                <td>
+                    {{item.total_in_all}}
+                </td>
+                <td><button class="btn btn-primary details"
+                    data-bs-toggle="modal" data-bs-target="#inventoryItemModal"
+                    data-bs-id = "{{item.id}}"
+                    data-id="{{item.id}}"
+                    >more</button></td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    {% else %}
+    <h1>There is no Item for this warehouse</h1>
+    {% endif %}    
+    
+</div>
+<!-- Modal for warehouse items -->
+<div class="modal fade" id="inventoryItemModal" tabindex="-1" aria-labelledby="inventoryItemModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-xl modal-dialog-scrollable">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h1 class="modal-title fs-5" id="inventoryItemModalLabel">Inventory Item Details</h1>
+          <button type="button" class="btn-close m-0 p-0" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body" id="inventoryItemModal_id">
+        </div>
+      </div>
+    </div>
+</div>
+
+{% endblock %}
+{% block js %}
+<script>
+    let table = $('table').DataTable(
+        {
+        "lengthMenu": [ 25, 50, 75, 100 ],
+        //"searching": false
+        "columns": [
+        { "searchable": false },
+        null,
+        { "searchable": false },
+        { "searchable": false },
+        { "searchable": false },
+        { "searchable": false },
+        { "searchable": false },
+        { "searchable": false },
+    ]
+        
+        }
+    )
+
+    $('body').on('click','.details',function(event){
+        let button = event.currentTarget
+        let id = button.getAttribute('data-id')
+        const modalContent = document.getElementById("inventoryItemModal_id")
+
+        $.ajax({
+            method : 'get',
+            url : '{% url "inventory_item_details" %}',
+            data : {id:id}
+        }).done (function (data) {
+            modalContent.innerHTML = data
+        }).fail(function(data){
+            modalContent.innerHTML = "<h1>Something went wrong please try again.</h1>"
+        })
+    
+    })
+</script>
+{% endblock %}

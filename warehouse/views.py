@@ -1048,10 +1048,78 @@ def send_mir_from_warehouse(request):
     messages.error(request,msg)
     return redirect("mir_list_warehouse")
     
+
+@login_required
+def warehouse_details(request,id):
+    wh = Warehouse.objects.get(id=id)
+    project = request.GET.get('project',None)
+    get_file = request.GET.get('get_file',None)
+    projects = Project.objects.all()
+    if project:
+        items = inventoryItem.objects.filter(warehouse__id=id,remaining__gt=0,project=project)
+    else:
+        items = inventoryItem.objects.filter(warehouse__id=id,remaining__gt=0)
         
+    if get_file:
+        output = io.BytesIO()
+        workbook = xlsxwriter.Workbook(output)
+        worksheet = workbook.add_worksheet()
+        i = 0
+        worksheet.write(i,0,"Row Num.")
+        worksheet.write(i,1,"Project")
+        worksheet.write(i,2,"Item")
+        worksheet.write(i,3,"Unit")
+        worksheet.write(i,4,"condition")
+        worksheet.write(i,5,"MRS")
+        worksheet.write(i,6,"MIR")
+        worksheet.write(i,9,"Quantity (remaining)")
+        worksheet.write(i,7,"Incoming")
+        worksheet.write(i,8,"Outgoing")
+        worksheet.write(i,10,"Updated(Date)")
+        i=1
+        for item in items:
+            worksheet.write(i,0,1)
+            worksheet.write(i,1,item.project.name)
+            worksheet.write(i,2,item.item.name)
+            worksheet.write(i,3,item.unit.abrv)
+            worksheet.write(i,4,item.condition.name)
+            txt = "\n".join([x.__str__() for x in item.mrs_items.all()])
+            worksheet.write(i,5,txt)
+            txt = "\n".join([x.__str__() for x in item.mir_items.all()])
+            worksheet.write(i,6,txt)
+            worksheet.write(i,7,item.incoming)
+            worksheet.write(i,8,item.outgoing)
+            worksheet.write(i,9,item.remaining)
+            worksheet.write(i,10,item.updated.strftime("%Y/%m/%d"))
+            i += 1
+        workbook.close()
+        output.seek(0)
+        filename = "inventory-list.xlsx"
+        response = HttpResponse(
+            output,
+            content_type="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+        )
+        response["Content-Disposition"] = "attachment; filename=%s" % filename
+        return response
+    return render(request,
+        'warehouse/warehouse_details.html',
+        context={'items':items,
+                'wh':wh,
+                'project_id':int(project) if project else None,
+                'projects':projects
+                }
+        )
+    
 # # -----------------------------------
 # # ajax calls
 # # -----------------------------------
+@login_required
+def inventory_item_details(request):
+    id = request.GET.get('id',None)
+    if id:
+        inv = inventoryItem.objects.get(id=id)
+        return render(request,'warehouse/partials/inventory_item_details.html',
+                      context={'inv':inv})
 @login_required
 def create_item_name(request):
     name = request.GET.get('name',None)
@@ -1156,7 +1224,7 @@ def get_warehouse_items(request):
     if wh_id:
         # items = Item.objects.filter(mrsitems__mrs__warehouse__id=wh_id).annotate
         items = inventoryItem.objects.filter(warehouse__id=wh_id,remaining__gt=0)
-        return render(request,'warehouse/partials/warehouse_items.html',context={'items':items})
+        return render(request,'warehouse/partials/warehouse_items.html',context={'items':items,'wh_id':wh_id})
 # @login_required
 # def get_po_items(request):
 #     po_id = request.GET.get('id',None)
