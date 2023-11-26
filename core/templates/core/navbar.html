@@ -15,7 +15,6 @@
     <div class="collapse navbar-collapse" id="homeNavBar">
       <ul class="navbar-nav me-auto mb-2 mb-lg-0">
 
-        {% if request.user.is_authenticated and request.user.is_superuser %}
         <li class="nav-item dropdown">
           <a
             class="nav-link dropdown-toggle"
@@ -32,7 +31,6 @@
             <li><a class="dropdown-item" href="{% url 'create_user' %}">Create a new User </a></li>
           </ul>
         </li>
-        {% endif %}
         {% if request.user.is_authenticated  %}
         <li class="nav-item dropdown">
           <a
@@ -92,7 +90,6 @@
 
 
         {% if request.user.is_authenticated %}
-          {% if request.user.is_superuser or request.user.technical %}
           <li class="nav-item dropdown">
             <a
               class="nav-link dropdown-toggle"
@@ -117,8 +114,6 @@
               <li><a class="dropdown-item" href="{% url 'mir_add' %}">Create a new MIR </a></li>
             </ul>
           </li>          
-          {% endif %}
-          {% if request.user.is_superuser or request.user.warehouse_keeper or request.user.technical %}
           <li class="nav-item dropdown">
             <a
               class="nav-link dropdown-toggle"
@@ -137,7 +132,6 @@
               <li><a class="dropdown-item" href="{% url 'mir_list_warehouse' %}">List of MIR </a></li>
             </ul>
           </li>          
-          {% endif %}
 
 
 
