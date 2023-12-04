@@ -9,7 +9,8 @@ from .forms import (UnitForm,ProjectForm,
     ConditionForm,
     MaterialIssueRequestForm,MIRItemFromSet,
     CategoryForm,ClusterForm,PipeLineForm,
-    MrNumberForm
+    MrNumberForm,
+    # MaterialTransferForm,MaterialTransferFromSet
     )
 from django.http import HttpRequest,JsonResponse,HttpResponse
 from django.contrib.auth.decorators import login_required
@@ -807,7 +808,9 @@ def mrs_list(request:HttpRequest):
     
     context = {
         'title':'Material Receipt Sheet List',
-        'mrss':mrss
+        'mrss':mrss,
+        'projects':projects,
+        'project':int(project) if project else None
     }
     return render(request,'warehouse/mrs-list.html',context)
 
@@ -1109,6 +1112,34 @@ def warehouse_details(request,id):
                 'projects':projects
                 }
         )
+
+@login_required
+def mir_transfer(request):
+    user = request.user
+    form = MaterialTransferForm(request.POST or None)
+    inline_form = None
+    if request.method == 'POST' and form.is_valid():
+        obj = form.save(commit=False)
+        inline_form = MaterialTransferFromSet(request.POST,instance=obj,form_kwargs={"mrs":obj.mrs})
+        if inline_form.is_valid():
+            obj.created_by = user
+            obj.save()
+            inline_form.save()
+            msg = 'Transfer was created successfully.'
+            messages.success(request,msg)
+            return redirect('mir_list')
+        else:
+            print(inline_form.errors)
+    else:
+        print(form.errors)
+    
+    context = {
+        'title': 'Transfer a Material',
+        'form':form,
+        'formset':inline_form
+    }
+    return render(request,'warehouse/mir-transfer.html',context)
+
     
 # # -----------------------------------
 # # ajax calls

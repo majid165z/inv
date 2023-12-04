@@ -317,7 +317,7 @@ class MaterialReceiptSheet(models.Model):
 
 class MRSItemManager(models.Manager):
     def get_queryset(self):
-        return super().get_queryset().select_related('mrs','pl_item','condition','mrs__pl','mrs__pl__po','pl_item__po_item','pl_item__po_item__item')
+        return super().get_queryset().select_related('mrs','pl_item','condition')
 class MRSItem(models.Model):
     mrs = models.ForeignKey(MaterialReceiptSheet,related_name='items',on_delete=models.CASCADE)
     pl_item = models.ForeignKey(PLItem,on_delete=models.CASCADE,verbose_name='PO Item Num',related_name='mrsitems')
@@ -328,7 +328,7 @@ class MRSItem(models.Model):
 
     created = models.DateTimeField(auto_now=False,auto_now_add=True)
     updated = models.DateTimeField(auto_now=True,auto_now_add=False)
-    objects = MRSItemManager()
+    # objects = MRSItemManager()
     class Meta:
         verbose_name = "MRS Item"
         verbose_name_plural = "MRS Items"

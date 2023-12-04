@@ -199,36 +199,36 @@ MIRItemFromSet = inlineformset_factory(
     fields=['mrs_item','quantity','remarks','cluster','pipeline']
 )
 
-class MaterialTransferForm(forms.ModelForm):
-    class Meta:
-        model = MaterialIssueRequest
-        fields = ['project','number','po','pl','mrs','warehouse','issue_date','dest_warehouse']
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        if self.instance.pk:
-            self.fields['po'].queryset = self.fields['po'].queryset.filter(project=self.instance.project)
-            self.fields['pl'].queryset = self.fields['pl'].queryset.filter(po=self.instance.po)
-            self.fields['mrs'].queryset = self.fields['mrs'].queryset.filter(pl=self.instance.pl)
-        self.fields['issue_date'] = JalaliDateField(label='Issue Date', 
-            widget=AdminJalaliDateWidget 
-        )
-        self.fields['required_date'] = JalaliDateField(label='Required Date', 
-            widget=AdminJalaliDateWidget 
-        )
-class MaterialTransferItemForm(forms.ModelForm):
-    class Mata:
-        model = MIRItem
-        fields = ['mrs_item','quantity']
-    def __init__(self, *args, **kwargs):
-        mrs = kwargs.pop('mrs',None)
-        wh = kwargs.pop('wh',None)
-        super().__init__(*args, **kwargs)
-        if mrs:
-            poitems = [("","--------")]+[(item.id, item.__str__()) for item in mrs.items.all() if item.warehouse == wh]
-            self.fields['mrs_item'].choices = poitems
+# class MaterialTransferForm(forms.ModelForm):
+#     class Meta:
+#         model = MaterialIssueRequest
+#         fields = ['project','number','po','pl','mrs','warehouse','issue_date','dest_warehouse']
+#     def __init__(self, *args, **kwargs):
+#         super().__init__(*args, **kwargs)
+#         if self.instance.pk:
+#             self.fields['po'].queryset = self.fields['po'].queryset.filter(project=self.instance.project)
+#             self.fields['pl'].queryset = self.fields['pl'].queryset.filter(po=self.instance.po)
+#             self.fields['mrs'].queryset = self.fields['mrs'].queryset.filter(pl=self.instance.pl)
+#         self.fields['issue_date'] = JalaliDateField(label='Issue Date', 
+#             widget=AdminJalaliDateWidget 
+#         )
+#         self.fields['required_date'] = JalaliDateField(label='Required Date', 
+#             widget=AdminJalaliDateWidget 
+#         )
+# class MaterialTransferItemForm(forms.ModelForm):
+#     class Mata:
+#         model = MIRItem
+#         fields = ['mrs_item','quantity']
+#     def __init__(self, *args, **kwargs):
+#         mrs = kwargs.pop('mrs',None)
+#         wh = kwargs.pop('wh',None)
+#         super().__init__(*args, **kwargs)
+#         if mrs:
+#             poitems = [("","--------")]+[(item.id, item.__str__()) for item in mrs.items.all() if item.warehouse == wh]
+#             self.fields['mrs_item'].choices = poitems
 
-MaterialTransferFromSet = inlineformset_factory(
-    MaterialIssueRequest,MIRItem,form=MaterialTransferItemForm,extra=2,
-    can_delete=True,can_delete_extra=True,
-    fields=['mrs_item','quantity']
-)
+# MaterialTransferFromSet = inlineformset_factory(
+#     MaterialIssueRequest,MIRItem,form=MaterialTransferItemForm,extra=2,
+#     can_delete=True,can_delete_extra=True,
+#     fields=['mrs_item','quantity']
+# )
