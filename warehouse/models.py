@@ -328,7 +328,7 @@ class MRSItem(models.Model):
 
     created = models.DateTimeField(auto_now=False,auto_now_add=True)
     updated = models.DateTimeField(auto_now=True,auto_now_add=False)
-    # objects = MRSItemManager()
+    objects = MRSItemManager()
     class Meta:
         verbose_name = "MRS Item"
         verbose_name_plural = "MRS Items"
