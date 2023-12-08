@@ -82,5 +82,6 @@ urlpatterns = [
     path('ajax/get_items_ajax',views.get_items_ajax,name='get_items_ajax'),
     path('ajax/get_mrs_items',views.get_mrs_items,name='get_mrs_items'),
     path('ajax/inventory_item_details',views.inventory_item_details,name='inventory_item_details'),
+    path('ajax/get_mir_transform',views.get_mir_transform,name='get_mir_transform'),
     # path('get_po_items',views.get_po_items,name='get_po_items'),
 ]

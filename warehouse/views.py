@@ -10,7 +10,7 @@ from .forms import (UnitForm,ProjectForm,
     MaterialIssueRequestForm,MIRItemFromSet,
     CategoryForm,ClusterForm,PipeLineForm,
     MrNumberForm,
-    # MaterialTransferForm,MaterialTransferFromSet
+    MaterialTransferForm,MaterialTransferFromSet
     )
 from django.http import HttpRequest,JsonResponse,HttpResponse
 from django.contrib.auth.decorators import login_required
@@ -903,7 +903,9 @@ def mir_add(request:HttpRequest):
     inline_form = None
     if request.method == 'POST' and form.is_valid():
         obj = form.save(commit=False)
-        inline_form = MIRItemFromSet(request.POST,instance=obj,form_kwargs={"mrs":obj.mrs})
+        mrs = obj.mrs
+        items = [("","--------")]+[(item.id, item.__str__()) for item in mrs.items.all()]
+        inline_form = MIRItemFromSet(request.POST,instance=obj,form_kwargs={"items":items})
         if inline_form.is_valid():
             obj.created_by = user
             obj.save()
@@ -938,7 +940,9 @@ def mir_edit(request:HttpRequest,id):
     inline_form = None
     if request.method == 'POST' and form.is_valid():
         obj = form.save()
-        inline_form = MIRItemFromSet(request.POST,instance=mir,form_kwargs={"mrs":mir.mrs})
+        mrs = mir.mrs
+        items = [("","--------")]+[(item.id, item.__str__()) for item in mrs.items.all()]
+        inline_form = MIRItemFromSet(request.POST,instance=mir,form_kwargs={"items":items})
         if inline_form.is_valid():
             inline_form.save()
             msg = 'MIR was edited successfully.'
@@ -952,7 +956,9 @@ def mir_edit(request:HttpRequest,id):
     if inline_form:
         formset = inline_form
     else:
-        formset = MIRItemFromSet(request.POST or None,instance=mir,form_kwargs={"mrs":mir.mrs})
+        mrs = mir.mrs
+        items = [("","--------")]+[(item.id, item.__str__()) for item in mrs.items.all()]
+        formset = MIRItemFromSet(request.POST or None,instance=mir,form_kwargs={"items":items})
         formset.extra = 0
 
     context = {
@@ -1120,9 +1126,11 @@ def mir_transfer(request):
     inline_form = None
     if request.method == 'POST' and form.is_valid():
         obj = form.save(commit=False)
-        inline_form = MaterialTransferFromSet(request.POST,instance=obj,form_kwargs={"mrs":obj.mrs})
+        items = [("","--------")]+[(item.id, item.__str__()) for item in obj.mrs.items.all()]
+        inline_form = MaterialTransferFromSet(request.POST,instance=obj,form_kwargs={"items":items})
         if inline_form.is_valid():
             obj.created_by = user
+            obj.transfer = True
             obj.save()
             inline_form.save()
             msg = 'Transfer was created successfully.'
@@ -1144,6 +1152,14 @@ def mir_transfer(request):
 # # -----------------------------------
 # # ajax calls
 # # -----------------------------------
+@login_required
+def get_mir_transform(request):
+    mrs_id = request.GET.get('mrs_id',None)
+    if mrs_id:
+        mrs = MaterialReceiptSheet.objects.get(id=mrs_id)
+        items = [("","--------")]+[(item.id, item.__str__()) for item in mrs.items.all()]
+        formset = MaterialTransferFromSet(form_kwargs={'items':items})
+        return render(request,'warehouse/partials/mir__transfer_form.html',context={'formset':formset})
 @login_required
 def inventory_item_details(request):
     id = request.GET.get('id',None)
@@ -1240,7 +1256,8 @@ def get_mir_formset(request):
     mrs_id = request.GET.get('mrs_id',None)
     if mrs_id:
         mrs = MaterialReceiptSheet.objects.get(id=mrs_id)
-        formset = MIRItemFromSet(form_kwargs={'mrs':mrs})
+        items = [("","--------")]+[(item.id, item.__str__()) for item in mrs.items.all()]
+        formset = MIRItemFromSet(form_kwargs={'items':items})
         return render(request,'warehouse/partials/mir_form.html',context={'formset':formset})
 @login_required
 def get_pl_warehouse(request):

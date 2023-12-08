@@ -268,6 +268,7 @@ class PLItem(models.Model):
     po_item = models.ForeignKey(POItem,on_delete=models.CASCADE,related_name='plitems',verbose_name='PO Item No.')
     created = models.DateTimeField(auto_now=False,auto_now_add=True)
     updated = models.DateTimeField(auto_now=True,auto_now_add=False)
+    
     objects = PLItemManager()
     class Meta:
         verbose_name = "قلم  بارنامه"
@@ -317,7 +318,7 @@ class MaterialReceiptSheet(models.Model):
 
 class MRSItemManager(models.Manager):
     def get_queryset(self):
-        return super().get_queryset().select_related('mrs','pl_item','condition')
+        return super().get_queryset().select_related('mrs','pl_item','condition','pl_item__po_item','pl_item__po_item__unit','pl_item__po_item__cluster','pl_item__po_item__pipeline')
 class MRSItem(models.Model):
     mrs = models.ForeignKey(MaterialReceiptSheet,related_name='items',on_delete=models.CASCADE)
     pl_item = models.ForeignKey(PLItem,on_delete=models.CASCADE,verbose_name='PO Item Num',related_name='mrsitems')
@@ -333,6 +334,8 @@ class MRSItem(models.Model):
         verbose_name = "MRS Item"
         verbose_name_plural = "MRS Items"
     def __str__(self) -> str:
+        
+        # return "hi"
         return f'{self.pl_item.po_item.item.name}, {self.pl_item.po_item.unit}, {self.pl_item.po_item.cluster or " "}, {self.pl_item.po_item.pipeline or " "} : {self.quantity}, {self.condition}'
     def save(self,*args,**kwargs):
         if self._state.adding:
@@ -352,7 +355,7 @@ class MRSItem(models.Model):
         else:
             iv.incoming = MRSItem.objects.filter(
                 mrs__project=self.mrs.project,
-                mrs__warehouse = self.warehouse,
+                warehouse = self.warehouse,
                 pl_item__po_item__item = self.pl_item.po_item.item,
                 condition=self.condition,
                 pl_item__po_item__unit = self.pl_item.po_item.unit,
